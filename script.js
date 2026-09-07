@@ -10,19 +10,57 @@ const chatInput = document.querySelector('#chat-input');
 const chatMessages = document.querySelector('.chat-messages');
 
 const replies = [
-  'That sounds exciting. I am learning, experimenting, and trying to turn ideas into useful projects.',
-  'I love solving real problems with simple, thoughtful digital experiences.',
-  'Good ideas become stronger when they are tested, improved, and shared with people who care.',
-  'I am currently focused on building my foundations while exploring AI, security, and practical product thinking.',
-  'Thanks for the message — let’s talk about a project, an idea, or a challenge worth solving.'
+  'That sounds exciting. Shiwant is learning through real projects and trying to turn ideas into useful experiences.',
+  'He enjoys solving practical problems with a mix of curiosity, logic, and creativity.',
+  'Good ideas grow stronger when they are tested, improved, and shared with real people.',
+  'His focus is building a strong foundation while exploring AI, cybersecurity, and product thinking.',
+  'That’s a great question. He likes ideas that are simple, useful, and meaningful to people.',
+  'Shiwant is someone who learns by doing, experimenting, and improving with each project.'
 ];
+
+const quickResponses = {
+  about: 'Shiwant is a curious BCA student who enjoys building useful ideas, learning by doing, and solving problems with technology.',
+  skills: 'His core focus includes coding, problem-solving, AI awareness, teamwork, and cybersecurity interest.',
+  projects: 'He likes building practical ideas such as college utility tools, cybersecurity awareness portals, and AI-based learning concepts.',
+  contact: 'You can reach out via email or connect through LinkedIn or GitHub. He is always open to thoughtful collaborations.',
+  hello: 'Hi! I’m Shiwant’s AI assistant. Ask me about his projects, skills, goals, or how to connect with him.',
+  default: 'I can help with Shiwant’s skills, projects, vision, and contact details. Ask me anything specific.'
+};
+
+const getAssistantReply = (text) => {
+  const query = text.toLowerCase();
+
+  if (query.includes('hello') || query.includes('hi') || query.includes('hey')) return quickResponses.hello;
+  if (query.includes('about') || query.includes('who') || query.includes('yourself') || query.includes('shiwant')) return quickResponses.about;
+  if (query.includes('skill') || query.includes('tech') || query.includes('learn') || query.includes('strength')) return quickResponses.skills;
+  if (query.includes('project') || query.includes('work') || query.includes('idea') || query.includes('portfolio')) return quickResponses.projects;
+  if (query.includes('contact') || query.includes('email') || query.includes('linkedin') || query.includes('github')) return quickResponses.contact;
+  if (query.includes('sih') || query.includes('hackathon')) return 'Shiwant is aiming to participate in SIH 2026 and build a meaningful idea with real-world value.';
+  if (query.includes('ai') || query.includes('cyber') || query.includes('security')) return 'He is especially interested in AI, cybersecurity, and practical digital problem-solving.';
+  if (query.includes('goal') || query.includes('future') || query.includes('mca') || query.includes('placement')) return 'His long-term goal is to grow into a strong IT professional, pursue MCA, and build a successful career in technology.';
+  if (query.includes('why') || query.includes('why not') || query.includes('tell me more')) return 'Because he enjoys turning curiosity into action. He likes learning through projects, improving ideas, and creating solutions that feel useful to people.';
+  if (query.includes('can you') || query.includes('help me')) return 'Yes — I can help with his background, projects, skills, goals, and ways to connect with him.';
+
+  return replies[Math.floor(Math.random() * replies.length)];
+};
 
 const setChatOpen = (isOpen) => {
   chatWidget.classList.toggle('is-open', isOpen);
   chatLauncher.setAttribute('aria-expanded', String(isOpen));
   chatLauncher.setAttribute('aria-label', isOpen ? 'Minimize chat' : 'Open chat');
   chatPanel.setAttribute('aria-hidden', String(!isOpen));
-  if (isOpen) window.setTimeout(() => chatInput.focus(), 250);
+
+  if (isOpen) {
+    const existingIntro = chatMessages.querySelector('.chat-message--intro');
+    if (!existingIntro) {
+      const intro = document.createElement('div');
+      intro.className = 'chat-message chat-message--bot chat-message--intro';
+      intro.textContent = 'How can I help you learn more about Shiwant?';
+      chatMessages.append(intro);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    setTimeout(() => chatInput.focus(), 250);
+  }
 };
 
 chatLauncher.addEventListener('click', () => setChatOpen(!chatWidget.classList.contains('is-open')));
@@ -47,13 +85,7 @@ chatForm.addEventListener('submit', (event) => {
   chatMessages.append(typing);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 
-  const responseText = text.toLowerCase().includes('project')
-    ? 'Projects are where theory becomes real impact. I enjoy ideas that are simple, useful, and genuinely solve a problem.'
-    : text.toLowerCase().includes('skill')
-      ? 'My current focus is on problem-solving, coding basics, AI awareness, and building confidence with real-world projects.'
-      : text.toLowerCase().includes('hello') || text.toLowerCase().includes('hi')
-        ? 'Hi! Nice to meet you. I am Shiwant, and I am building ideas that are practical, thoughtful, and useful.'
-        : replies[Math.floor(Math.random() * replies.length)];
+  const responseText = getAssistantReply(text);
 
   window.setTimeout(() => {
     typing.remove();
@@ -63,6 +95,15 @@ chatForm.addEventListener('submit', (event) => {
     chatMessages.append(reply);
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }, 900);
+});
+
+document.querySelectorAll('.chat-prompt').forEach((button) => {
+  button.addEventListener('click', () => {
+    const prompt = button.textContent.trim();
+    chatInput.value = prompt;
+    chatInput.focus();
+    chatForm.requestSubmit();
+  });
 });
 
 document.addEventListener('keydown', (event) => {
