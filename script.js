@@ -66,6 +66,13 @@ const setChatOpen = (isOpen) => {
 chatLauncher.addEventListener('click', () => setChatOpen(!chatWidget.classList.contains('is-open')));
 chatClose.addEventListener('click', () => setChatOpen(false));
 
+document.querySelectorAll('[data-open-chat]').forEach((link) => {
+  link.addEventListener('click', (event) => {
+    event.preventDefault();
+    setChatOpen(true);
+  });
+});
+
 chatForm.addEventListener('submit', (event) => {
   event.preventDefault();
   const text = chatInput.value.trim();

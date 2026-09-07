@@ -1,0 +1,60 @@
+<svg width="1200" height="1200" viewBox="0 0 1200 1200" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Bharati Vidyapeeth Deemed University Pune emblem</title>
+  <desc id="desc">College crest matching Bharati Vidyapeeth Deemed University Pune logo</desc>
+
+  <defs>
+    <linearGradient id="gold" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#f3dc75"/>
+      <stop offset="100%" stop-color="#d9b23a"/>
+    </linearGradient>
+    <linearGradient id="steel" x1="0" x2="1">
+      <stop offset="0%" stop-color="#d8d1c5"/>
+      <stop offset="100%" stop-color="#a9a297"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0" x2="1">
+      <stop offset="0%" stop-color="#9bc2d9"/>
+      <stop offset="100%" stop-color="#7caad0"/>
+    </linearGradient>
+  </defs>
+
+  <g stroke="#2d2b2a" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <g fill="url(#steel)">
+      <path d="M235 145c-80-44-146-111-175-185 90 42 160 82 232 165l63 143-62 46-58-59z"/>
+      <path d="M312 196c-110 7-204-49-264-117 95 18 177 34 269 34l113 186-59 17-59-120z"/>
+      <path d="M965 145c80-44 146-111 175-185-90 42-160 82-232 165l-63 143 62 46 58-59z"/>
+      <path d="M888 196c110 7 204-49 264-117-95 18-177 34-269 34l-113 186 59 17 59-120z"/>
+      <path d="M410 150c-102-142-168-186-256-219 146 30 233 147 312 314l-56 30z"/>
+      <path d="M790 150c102-142 168-186 256-219-146 30-233 147-312 314l56 30z"/>
+      <path d="M338 220c-64-102-123-157-217-214 129 26 215 118 286 275l-69-61z"/>
+      <path d="M862 220c64-102 123-157 217-214-129 26-215 118-286 275l69-61z"/>
+    </g>
+
+    <g>
+      <circle cx="600" cy="340" r="265" fill="url(#gold)"/>
+      <circle cx="600" cy="340" r="215" fill="#f3dfb0"/>
+      <circle cx="600" cy="340" r="190" fill="#f4efe9"/>
+      <circle cx="600" cy="340" r="142" fill="#efb8c8"/>
+      <circle cx="600" cy="340" r="118" fill="#f8f3ef"/>
+
+      <path d="M435 330l165 150 165-150 104 96-191 197h-177l-191-197 104-96z" fill="#1d1d1d"/>
+      <path d="M438 315l162 155 162-155 115 108-194 206h-166l-194-206 115-108z" fill="#16191d"/>
+      <circle cx="600" cy="348" r="102" fill="#12181d"/>
+      <path d="M572 265l28 57 62 18-44 38 14 62-60-32-60 32 14-62-44-38 62-18 28-57z" fill="#12181d"/>
+      <path d="M515 288l86 89 86-89" fill="none" stroke="#12181d" stroke-width="12"/>
+    </g>
+
+    <g font-family="Georgia, 'Times New Roman', serif" font-weight="700" fill="#1a1d1e">
+      <path id="arcTop" d="M260 278A340 340 0 0 1 940 278" fill="none"/>
+      <text font-size="58" letter-spacing="8">
+        <textPath href="#arcTop" startOffset="50%" text-anchor="middle">BHARATI VIDYAPEETH</textPath>
+      </text>
+    </g>
+
+    <g>
+      <path d="M190 730c90-42 180-63 410-63s320 21 410 63l86 108c-142 60-289 90-496 90-207 0-354-30-496-90l86-108z" fill="url(#blue)"/>
+      <text x="600" y="778" text-anchor="middle" font-size="62" font-weight="700" fill="#1d1d1d" font-family="Georgia, 'Times New Roman', serif" letter-spacing="6">DEEMED UNIVERSITY</text>
+      <path d="M260 872c54-31 168-47 340-47s286 16 340 47l-86 82H346l-86-82z" fill="#ecd46f"/>
+      <text x="600" y="905" text-anchor="middle" font-size="58" font-weight="700" fill="#1d1d1d" font-family="Georgia, 'Times New Roman', serif" letter-spacing="6">PUNE</text>
+    </g>
+  </g>
+</svg>
