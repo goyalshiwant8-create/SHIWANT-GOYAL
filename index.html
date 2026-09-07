@@ -113,6 +113,16 @@
           <a class="help-option" href="#projects"><span>02</span><strong>See the work</strong><small>Explore projects and ideas</small><b aria-hidden="true">↗</b></a>
           <a class="help-option" href="#contact"><span>03</span><strong>Get in touch</strong><small>Call, email, or connect online</small><b aria-hidden="true">↗</b></a>
         </div>
+        <div class="help-ai">
+          <div class="help-ai-heading"><span class="eyebrow">HELP AI</span><strong>Ask for a quick answer.</strong><p>Tell me what you need and I’ll guide you to the right part of the website.</p></div>
+          <form id="help-form" class="help-form">
+            <div class="help-form-row"><label for="help-name">Your name</label><input id="help-name" name="name" type="text" placeholder="Your name" required /></div>
+            <div class="help-form-row"><label for="help-email">Email</label><input id="help-email" name="email" type="email" placeholder="you@example.com" required /></div>
+            <div class="help-form-row help-form-row--full"><label for="help-question">How can I help?</label><textarea id="help-question" name="question" rows="3" placeholder="Ask about projects, skills, or contact details" required></textarea></div>
+            <button class="help-send" type="submit">Send message <span aria-hidden="true">↗</span></button>
+            <p id="help-response" class="help-response" role="status" aria-live="polite"></p>
+          </form>
+        </div>
       </div>
     </section>
 

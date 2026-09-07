@@ -8,6 +8,8 @@ const chatClose = document.querySelector('.chat-close');
 const chatForm = document.querySelector('.chat-form');
 const chatInput = document.querySelector('#chat-input');
 const chatMessages = document.querySelector('.chat-messages');
+const helpForm = document.querySelector('#help-form');
+const helpResponse = document.querySelector('#help-response');
 
 const replies = [
   'That sounds exciting. Shiwant is learning through real projects and trying to turn ideas into useful experiences.',
@@ -111,6 +113,12 @@ document.querySelectorAll('.chat-prompt').forEach((button) => {
     chatInput.focus();
     chatForm.requestSubmit();
   });
+});
+
+helpForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const question = new FormData(helpForm).get('question').trim();
+  helpResponse.textContent = `Thanks for your question. ${getAssistantReply(question)} I’ll help you find the right details.`;
 });
 
 document.addEventListener('keydown', (event) => {
