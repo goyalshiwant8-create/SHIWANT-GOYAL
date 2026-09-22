@@ -1,166 +1,1203 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="cyberpunk">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Shiwant Goyal — aspiring innovator and problem solver building useful technology." />
-  <title>Shiwant Goyal | Aspiring Innovator</title>
+  <meta name="description" content="Shiwant Goyal — BCA Student, Aspiring Software Developer, and Problem Solver building in C, Web Development, and AI." />
+  <meta name="keywords" content="Shiwant Goyal, BCA, BVIMR, C Developer, Web Developer, Portfolio, SIH 2026" />
+  <meta name="author" content="Shiwant Goyal" />
+  <title>Shiwant Goyal // Cyberpunk Developer Portfolio & Terminal</title>
+
+  <!-- Google Fonts Preconnect -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="page-glow page-glow--one" aria-hidden="true"></div>
-  <div class="page-glow page-glow--two" aria-hidden="true"></div>
+  <!-- Background Digital Matrix Canvas -->
+  <canvas id="matrix-canvas" aria-hidden="true"></canvas>
 
-  <header class="site-header">
-    <a class="brand" href="#top" aria-label="Shiwant Goyal home"><span>SG</span><b>SHIWANT<span>.</span></b></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open navigation"><span></span><span></span></button>
-    <nav id="site-nav" class="site-nav" aria-label="Primary navigation">
-      <a class="active" href="#about">About</a>
-      <a href="#skills">Skills</a>
-      <a href="#projects">Projects</a>
-      <a href="#contact">Contact</a>
-      <a href="#help">Help</a>
-      <a href="#chat" data-open-chat>Chat</a>
-    </nav>
+  <!-- Ambient CRT Scanline Overlay -->
+  <div class="crt-overlay" aria-hidden="true"></div>
+
+  <!-- Cyber HUD Header -->
+  <header class="hud-header">
+    <div class="hud-header__inner">
+      <a class="hud-brand" href="#top" aria-label="Shiwant Goyal Home">
+        <span class="hud-brand__badge">SG</span>
+        <div class="hud-brand__text">
+          <strong>SHIWANT_GOYAL<span class="cursor-blink">_</span></strong>
+          <small><span class="status-pulse"></span> SYSTEM: ONLINE</small>
+        </div>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav id="hud-nav" class="hud-nav" aria-label="Primary Navigation">
+        <a class="nav-link active" href="#about"><span class="nav-num">01.</span> About</a>
+        <a class="nav-link" href="#skills"><span class="nav-num">02.</span> Skills</a>
+        <a class="nav-link" href="#terminal-section"><span class="nav-num">03.</span> Terminal</a>
+        <a class="nav-link" href="#projects"><span class="nav-num">04.</span> Projects</a>
+        <a class="nav-link" href="#education"><span class="nav-num">05.</span> Journey</a>
+        <a class="nav-link" href="#resume-section"><span class="nav-num">06.</span> Resume</a>
+        <a class="nav-link" href="#contact"><span class="nav-num">07.</span> Contact</a>
+      </nav>
+
+      <!-- HUD Controls: Theme Switcher, Audio, Terminal Button -->
+      <div class="hud-controls">
+        <div class="theme-picker" title="Change Cyber Theme">
+          <button type="button" class="theme-btn active" data-theme="cyberpunk" title="Cyberpunk Neon">⚡</button>
+          <button type="button" class="theme-btn" data-theme="matrix" title="Matrix Emerald">🟢</button>
+          <button type="button" class="theme-btn" data-theme="synthwave" title="Synthwave Violet">🌆</button>
+          <button type="button" class="theme-btn" data-theme="stealth" title="Stealth Dark">🛡️</button>
+        </div>
+
+        <button id="sfx-toggle" class="control-icon-btn" type="button" title="Toggle UI Sound Effects" aria-label="Toggle UI Audio">
+          <span class="sfx-icon">🔊</span>
+        </button>
+
+        <button id="open-terminal-btn" class="hud-btn hud-btn--sm" type="button">
+          <span class="btn-prompt">>_</span> CLI
+        </button>
+
+        <button class="hud-menu-toggle" type="button" aria-expanded="false" aria-controls="hud-nav" aria-label="Toggle mobile menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
   </header>
 
   <main id="top">
-    <section class="hero section-shell">
-      <div class="hero-copy reveal">
-        <div class="hero-branding">
-          <p class="eyebrow"><span class="status-dot"></span> SIH 2026 PARTICIPANT</p>
-          <img class="college-logo" src="assets/college-logo.png" alt="Bharati Vidyapeeth Deemed University Pune logo" />
-        </div>
-        <h1>Building ideas<br /><em>that matter.</em></h1>
-        <p class="hero-intro">Shiwant Goyal | BCA Student | Aspiring Innovator</p>
-        <p class="hero-body">I’m Shiwant Goyal, a curious BCA student from Rohtak, Haryana, currently pursuing my studies at Bharati Vidyapeeth Institute Of Management and Research, New Delhi, with a strong interest in coding, AI, cybersecurity, and solving real-world problems through technology.</p>
-        <div class="hero-actions">
-          <a class="button button--primary" href="#projects">Explore my work <span aria-hidden="true">↗</span></a>
-          <a class="text-link" href="#contact">Let’s connect <span aria-hidden="true">→</span></a>
-        </div>
-      </div>
-      <div class="hero-visual reveal reveal--delay" aria-label="Portrait of Shiwant Goyal">
-        <div class="portrait-frame">
-          <div class="portrait-index">01 / 04</div>
-          <img src="assets/profile-photo.png" alt="Profile portrait of Shiwant Goyal" />
-          <div class="portrait-caption"><span>Based in India</span><span>Open to ideas</span></div>
-        </div>
-        <div class="orbit-label">CREATE<br />WITH<br /><span>INTENT</span></div>
-      </div>
-    </section>
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <div class="cyber-badge">
+            <span class="badge-dot"></span>
+            <span class="badge-text">SIH 2026 ASPIRANT // 1ST YEAR BCA @ BVIMR</span>
+          </div>
 
-    <section id="about" class="section-shell about-section">
-      <div class="section-heading reveal"><span class="section-number">01</span><h2>About me</h2><span class="heading-line"></span></div>
-      <div class="about-grid">
-        <p class="large-copy reveal">Learning the fundamentals.<br /><strong>Thinking beyond them.</strong></p>
-        <div class="about-details reveal reveal--delay">
-          <p>I’m currently exploring the intersection of code, people, and practical problem-solving. For me, technology is most exciting when it feels approachable and creates a real difference.</p>
-          <div class="fact-list">
-            <div><span>Name</span><strong>Shiwant Goyal</strong></div>
-            <div><span>Mobile</span><strong>9728010951</strong></div>
-            <div><span>College</span><strong>Bharati Vidyapeeth Institute Of Management and Research, New Delhi</strong></div>
-            <div><span>Education</span><strong>BCA Student, 1st Semester 2026</strong></div>
-            <div><span>Location</span><strong>Rohtak, Haryana, India</strong></div>
-            <div><span>Interests</span><strong>Coding &nbsp;·&nbsp; AI &nbsp;·&nbsp; Cybersecurity</strong></div>
+          <h1 class="hero-title">
+            <span class="glitch" data-text="ENGINEERING LOGIC.">ENGINEERING LOGIC.</span><br />
+            <span class="text-accent">BUILDING IMPACT.</span>
+          </h1>
+
+          <div class="typewriter-box">
+            <span class="cli-prefix">shiwant@dev:~$</span>
+            <span id="typewriter-text" class="typewriter-text"></span>
+            <span class="typewriter-cursor">|</span>
+          </div>
+
+          <p class="hero-description">
+            I’m <strong>Shiwant Goyal</strong>, a 1st-year BCA student at <em>Bharati Vidyapeeth Institute of Management &amp; Research, New Delhi</em>. 
+            Passionate about C programming, web development, algorithms, and practical cybersecurity. I learn by building real projects that matter.
+          </p>
+
+          <div class="hero-cta-group">
+            <a class="cyber-btn cyber-btn--primary" href="#projects">
+              <span>EXPLORE PROJECTS</span>
+              <span class="btn-arrow">↗</span>
+            </a>
+            <button class="cyber-btn cyber-btn--outline" id="hero-resume-btn" type="button">
+              <span>VIEW RESUME</span>
+              <span class="btn-arrow">📄</span>
+            </button>
+            <a class="cyber-btn cyber-btn--terminal" href="#terminal-section">
+              <span>LAUNCH TERMINAL</span>
+              <span class="btn-arrow">>_</span>
+            </a>
+          </div>
+
+          <!-- Quick Metrics Bar -->
+          <div class="hero-metrics">
+            <div class="metric-card">
+              <span class="metric-num">BCA '29</span>
+              <span class="metric-label">BVIMR New Delhi</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-num">5+</span>
+              <span class="metric-label">Projects Built</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-num">C &amp; WEB</span>
+              <span class="metric-label">Core Tech Focus</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-num">SIH '26</span>
+              <span class="metric-label">Hackathon Track</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Cyber Portrait Card -->
+        <div class="hero-visual">
+          <div class="cyber-portrait-frame" id="portrait-card">
+            <div class="frame-corner frame-corner--tl"></div>
+            <div class="frame-corner frame-corner--tr"></div>
+            <div class="frame-corner frame-corner--bl"></div>
+            <div class="frame-corner frame-corner--br"></div>
+
+            <div class="card-hud-bar">
+              <span class="hud-chip">ID: SG-2026-DEV</span>
+              <span class="hud-status"><span class="status-dot"></span> ACTIVE</span>
+            </div>
+
+            <div class="portrait-image-wrapper">
+              <img src="assets/profile-photo.png" alt="Shiwant Goyal Portrait" class="portrait-img" id="hero-portrait" />
+              <div class="portrait-scanline"></div>
+              <div class="portrait-glow"></div>
+            </div>
+
+            <div class="portrait-footer">
+              <div class="dev-spec">
+                <strong>Shiwant Goyal</strong>
+                <span>Aspiring Software Engineer</span>
+              </div>
+              <div class="location-tag">
+                <span>📍 Rohtak / New Delhi, IN</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="skills" class="section-shell skills-section">
-      <div class="section-heading reveal"><span class="section-number">02</span><h2>What I bring</h2><span class="heading-line"></span></div>
-      <div class="skills-layout">
-        <p class="section-note reveal">A growing toolkit for building, debugging, and bringing good ideas to life.</p>
-        <div class="skill-cloud reveal reveal--delay">
-          <span class="skill skill--featured">C</span><span class="skill">C++</span><span class="skill skill--accent">Python</span><span class="skill">HTML</span><span class="skill">CSS</span><span class="skill skill--featured">Troubleshooting</span><span class="skill skill--accent">Teamwork</span>
+    <!-- Interactive Developer Terminal Section -->
+    <section id="terminal-section" class="section terminal-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">[03 // INTERACTIVE CLI]</span>
+          <h2 class="section-title">Developer Terminal</h2>
+          <p class="section-subtitle">Interact with my system directly using native command-line instructions.</p>
+        </div>
+
+        <div class="terminal-window" id="cyber-terminal">
+          <div class="terminal-bar">
+            <div class="terminal-dots">
+              <span class="dot dot--red"></span>
+              <span class="dot dot--yellow"></span>
+              <span class="dot dot--green"></span>
+            </div>
+            <div class="terminal-title">shiwant@dev-station: ~/portfolio (zsh)</div>
+            <div class="terminal-actions">
+              <button type="button" class="term-action-btn" id="term-clear-btn" title="Clear Terminal">Clear</button>
+            </div>
+          </div>
+
+          <div class="terminal-body" id="terminal-output">
+            <div class="term-line term-welcome">
+              <span class="term-glow">=== SHIWANT GOYAL CYBER-OS [Version 2.6.0] ===</span><br />
+              Type <strong class="text-accent">'help'</strong> to see available commands or click the command chips below.<br />
+              Try commands like <strong class="text-accent">'about'</strong>, <strong class="text-accent">'skills'</strong>, <strong class="text-accent">'projects'</strong>, <strong class="text-accent">'resume'</strong>, or <strong class="text-accent">'matrix'</strong>.
+            </div>
+          </div>
+
+          <div class="terminal-input-row">
+            <span class="term-prompt">shiwant@dev:~$</span>
+            <input type="text" id="terminal-input" class="term-input" placeholder="Type 'help' or command..." autocomplete="off" spellcheck="false" />
+            <button type="button" id="terminal-submit-btn" class="term-submit-btn" aria-label="Execute command">↵</button>
+          </div>
+
+          <!-- Quick Command Chips -->
+          <div class="terminal-chips" aria-label="Suggested terminal commands">
+            <span>Quick:</span>
+            <button type="button" class="term-chip" data-cmd="help">help</button>
+            <button type="button" class="term-chip" data-cmd="about">about</button>
+            <button type="button" class="term-chip" data-cmd="skills">skills</button>
+            <button type="button" class="term-chip" data-cmd="projects">projects</button>
+            <button type="button" class="term-chip" data-cmd="education">education</button>
+            <button type="button" class="term-chip" data-cmd="resume">resume</button>
+            <button type="button" class="term-chip" data-cmd="sih">sih</button>
+            <button type="button" class="term-chip" data-cmd="clear">clear</button>
+          </div>
         </div>
       </div>
     </section>
 
-    <section id="projects" class="section-shell projects-section">
-      <div class="section-heading reveal"><span class="section-number">03</span><h2>Selected projects</h2><span class="heading-line"></span></div>
-      <div class="project-grid">
-        <article class="project-card reveal"><div class="project-top"><span class="project-icon">01</span><span class="project-arrow" aria-hidden="true">↗</span></div><h3>College Utility App</h3><p>A simple, focused space for students to find schedules, notices, and everyday campus tools faster.</p><div class="project-tags"><span>Productivity</span><span>Campus</span></div></article>
-        <article class="project-card project-card--orange reveal reveal--delay"><div class="project-top"><span class="project-icon">02</span><span class="project-arrow" aria-hidden="true">↗</span></div><h3>Cyber-Safe Portal</h3><p>An awareness-first portal that makes digital safety, privacy, and responsible browsing easier to understand.</p><div class="project-tags"><span>Security</span><span>Awareness</span></div></article>
-        <article class="project-card reveal reveal--delay-more"><div class="project-top"><span class="project-icon">03</span><span class="project-arrow" aria-hidden="true">↗</span></div><h3>AI Study Assistant</h3><p>A friendly concept for turning big study goals into clear plans, useful prompts, and steady progress.</p><div class="project-tags"><span>AI</span><span>Learning</span></div></article>
-      </div>
-    </section>
-
-    <section class="section-shell journey-section">
-      <div class="journey-column reveal"><div class="section-heading"><span class="section-number">04</span><h2>On the journey</h2></div><p>Every course, community, and challenge is another way to sharpen the craft.</p></div>
-      <div class="journey-grid">
-        <article class="journey-item reveal"><span class="journey-mark">↗</span><div><span class="item-label">Courses</span><h3>AIAD &amp; CYWDA</h3><p>Building a foundation in emerging technology and digital awareness.</p></div></article>
-        <article class="journey-item reveal reveal--delay"><span class="journey-mark">+</span><div><span class="item-label">Communities</span><h3>GeeksforGeeks &amp; Aman Dhattarwal</h3><p>Learning in public, finding better questions, and staying close to the developer community.</p></div></article>
-      </div>
-    </section>
-
-    <section class="section-shell goals-section">
-      <div class="section-heading reveal"><span class="section-number">05</span><h2>Where I’m headed</h2><span class="heading-line"></span></div>
-      <div class="goals-grid">
-        <article class="goal-card reveal"><span class="goal-number">01</span><span class="item-label">Short term</span><h3>Participate in SIH</h3><p>Bring a useful idea to Smart India Hackathon 2026 and learn from the people building alongside me.</p></article>
-        <article class="goal-card goal-card--dark reveal reveal--delay"><span class="goal-number">02</span><span class="item-label">Long term</span><h3>MCA &amp; IT Placement</h3><p>Grow into a capable IT professional with the depth to solve meaningful problems well.</p></article>
-      </div>
-    </section>
-
-    <section id="help" class="help-section">
-      <div class="section-shell help-inner reveal">
-        <div><p class="eyebrow">NEED A HAND?</p><h2>Find your way<br /><em>around.</em></h2></div>
-        <div class="help-options">
-          <a class="help-option" href="#about"><span>01</span><strong>Know Shiwant</strong><small>Read the background and journey</small><b aria-hidden="true">↗</b></a>
-          <a class="help-option" href="#projects"><span>02</span><strong>See the work</strong><small>Explore projects and ideas</small><b aria-hidden="true">↗</b></a>
-          <a class="help-option" href="#contact"><span>03</span><strong>Get in touch</strong><small>Call, email, or connect online</small><b aria-hidden="true">↗</b></a>
+    <!-- About Me Section -->
+    <section id="about" class="section about-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">[01 // WHO AM I]</span>
+          <h2 class="section-title">About Me</h2>
+          <p class="section-subtitle">Building a strong core in computer science and shipping meaningful digital solutions.</p>
         </div>
-        <div class="help-ai">
-          <div class="help-ai-heading"><span class="eyebrow">HELP AI</span><strong>Ask for a quick answer.</strong><p>Tell me what you need and I’ll guide you to the right part of the website.</p></div>
-          <form id="help-form" class="help-form">
-            <div class="help-form-row"><label for="help-name">Your name</label><input id="help-name" name="name" type="text" placeholder="Your name" required /></div>
-            <div class="help-form-row"><label for="help-email">Email</label><input id="help-email" name="email" type="email" placeholder="you@example.com" required /></div>
-            <div class="help-form-row help-form-row--full"><label for="help-question">How can I help?</label><textarea id="help-question" name="question" rows="3" placeholder="Ask about projects, skills, or contact details" required></textarea></div>
-            <button class="help-send" type="submit">Send message <span aria-hidden="true">↗</span></button>
-            <p id="help-response" class="help-response" role="status" aria-live="polite"></p>
-          </form>
+
+        <div class="about-grid">
+          <div class="about-narrative">
+            <h3 class="narrative-heading">
+              Curious mind. Rigorous foundations.<br />
+              <span class="text-accent">Learning by building real things.</span>
+            </h3>
+
+            <div class="narrative-body">
+              <p>
+                I’m <strong>Shiwant Goyal</strong>, a BCA student passionate about programming and web development. 
+                I’m currently building my foundation in C programming, HTML, CSS, JavaScript, and algorithmic problem-solving. 
+                I enjoy learning by constructing hands-on projects and continuously sharpening my technical instincts.
+              </p>
+              <p>
+                My ultimate goal is to grow into an elite, highly skilled software developer and create impactful, real-world digital experiences 
+                that solve concrete problems for people and organizations.
+              </p>
+            </div>
+
+            <!-- College & Academic Card -->
+            <div class="college-profile-card">
+              <div class="college-logo-wrap">
+                <img src="assets/college-logo.png" alt="Bharati Vidyapeeth Logo" class="college-logo-img" />
+              </div>
+              <div class="college-info">
+                <span class="college-eyebrow">INSTITUTION</span>
+                <h4>Bharati Vidyapeeth Institute of Management and Research</h4>
+                <p>New Delhi (BVIMR) &bull; Bachelor of Computer Applications (BCA)</p>
+                <div class="college-tags">
+                  <span>Semester 1</span>
+                  <span>Batch 2026 - 2029</span>
+                  <span>Computer Applications</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pillars-grid">
+              <div class="pillar-card">
+                <div class="pillar-icon">⚡</div>
+                <h4>Logic &amp; Systems First</h4>
+                <p>Starting with low-level C to understand memory, pointers, and control flow before abstraction.</p>
+              </div>
+              <div class="pillar-card">
+                <div class="pillar-icon">🌐</div>
+                <h4>Modern Web Craft</h4>
+                <p>Creating responsive, fast, and accessible digital experiences using HTML5, CSS3, and modern JS.</p>
+              </div>
+              <div class="pillar-card">
+                <div class="pillar-icon">🛡️</div>
+                <h4>Cybersecurity &amp; AI</h4>
+                <p>Deep curiosity for secure coding, digital privacy, and using AI tools to boost developer velocity.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Bio Data Terminal Card -->
+          <div class="about-dossier">
+            <div class="dossier-card">
+              <div class="dossier-header">
+                <span>SYSTEM DOSSIER // REQ-SG-01</span>
+                <span class="dossier-badge">VERIFIED</span>
+              </div>
+              <div class="dossier-list">
+                <div class="dossier-item">
+                  <span class="dossier-label">FULL NAME</span>
+                  <span class="dossier-val">Shiwant Goyal</span>
+                </div>
+                <div class="dossier-item">
+                  <span class="dossier-label">ROLE</span>
+                  <span class="dossier-val">BCA Student &amp; Aspiring Developer</span>
+                </div>
+                <div class="dossier-item">
+                  <span class="dossier-label">DEGREE</span>
+                  <span class="dossier-val">BCA (1st Year, 2026–2029)</span>
+                </div>
+                <div class="dossier-item">
+                  <span class="dossier-label">COLLEGE</span>
+                  <span class="dossier-val">BVIMR, New Delhi</span>
+                </div>
+                <div class="dossier-item">
+                  <span class="dossier-label">HOMETOWN</span>
+                  <span class="dossier-val">Rohtak, Haryana, India</span>
+                </div>
+                <div class="dossier-item">
+                  <span class="dossier-label">EMAIL</span>
+                  <span class="dossier-val"><a href="mailto:goyalshiwant8@gmail.com">goyalshiwant8@gmail.com</a></span>
+                </div>
+                <div class="dossier-item">
+                  <span class="dossier-label">PHONE</span>
+                  <span class="dossier-val"><a href="tel:+919728010951">+91 9728010951</a></span>
+                </div>
+                <div class="dossier-item">
+                  <span class="dossier-label">HACKATHON</span>
+                  <span class="dossier-val text-accent">Smart India Hackathon (SIH) 2026</span>
+                </div>
+                <div class="dossier-item">
+                  <span class="dossier-label">AVAILABILITY</span>
+                  <span class="dossier-val text-green">Open to Collaborations &amp; Internships</span>
+                </div>
+              </div>
+              <div class="dossier-footer">
+                <a class="cyber-btn cyber-btn--sm" href="#contact">GET IN TOUCH</a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <section id="contact" class="contact-section">
-      <div class="section-shell contact-inner reveal"><p class="eyebrow">HAVE A GOOD PROBLEM?</p><h2>Let’s make something<br /><em>useful.</em></h2><p class="contact-copy">I’m always open to a thoughtful conversation, a new challenge, or a chance to learn together.</p><a class="button button--light" href="tel:+919728010951">Call me <span aria-hidden="true">↗</span></a><div class="contact-links"><a href="tel:+919728010951">Mobile <span>↗</span></a><a href="mailto:shiwantgoyal.dev@gmail.com">Email <span>↗</span></a><a href="https://www.linkedin.com/in/shiwant-goyal" target="_blank" rel="noreferrer">LinkedIn <span>↗</span></a><a href="https://github.com/shiwantgoyal" target="_blank" rel="noreferrer">GitHub <span>↗</span></a></div></div>
+    <!-- Skills Matrix Section -->
+    <section id="skills" class="section skills-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">[02 // TECHNICAL ARSENAL]</span>
+          <h2 class="section-title">Skills &amp; Technologies</h2>
+          <p class="section-subtitle">Languages, web technologies, and computational problem-solving foundations.</p>
+        </div>
+
+        <!-- Skills Filter Tabs -->
+        <div class="skills-filter-nav" role="tablist">
+          <button type="button" class="filter-btn active" data-filter="all">All Skills</button>
+          <button type="button" class="filter-btn" data-filter="languages">Programming</button>
+          <button type="button" class="filter-btn" data-filter="web">Web Development</button>
+          <button type="button" class="filter-btn" data-filter="core">Core CS &amp; Logic</button>
+          <button type="button" class="filter-btn" data-filter="tools">Tools &amp; Workflow</button>
+        </div>
+
+        <div class="skills-grid" id="skills-container">
+          <!-- Skill: C Programming -->
+          <div class="skill-card" data-category="languages">
+            <div class="skill-header">
+              <span class="skill-icon">⚙️</span>
+              <div class="skill-meta">
+                <h4>C Language</h4>
+                <small>Core Systems &amp; Logic</small>
+              </div>
+              <span class="skill-level">PRIMARY</span>
+            </div>
+            <p class="skill-desc">Loops, conditional branching, modular functions, arrays, pointers, memory logic, CLI systems.</p>
+            <div class="skill-meter">
+              <div class="meter-bar" style="--level: 85%;"></div>
+            </div>
+            <div class="skill-tags">
+              <span>Variables &amp; Loops</span>
+              <span>Functions</span>
+              <span>Arrays</span>
+              <span>CLI Apps</span>
+            </div>
+          </div>
+
+          <!-- Skill: C++ -->
+          <div class="skill-card" data-category="languages">
+            <div class="skill-header">
+              <span class="skill-icon">⚡</span>
+              <div class="skill-meta">
+                <h4>C++</h4>
+                <small>Object-Oriented Logic</small>
+              </div>
+              <span class="skill-level">LEARNING</span>
+            </div>
+            <p class="skill-desc">Standard Template Library basics, object-oriented concepts, structured algorithms.</p>
+            <div class="skill-meter">
+              <div class="meter-bar" style="--level: 70%;"></div>
+            </div>
+            <div class="skill-tags">
+              <span>OOP</span>
+              <span>Classes</span>
+              <span>Standard I/O</span>
+            </div>
+          </div>
+
+          <!-- Skill: HTML5 -->
+          <div class="skill-card" data-category="web">
+            <div class="skill-header">
+              <span class="skill-icon">🧱</span>
+              <div class="skill-meta">
+                <h4>HTML5</h4>
+                <small>Modern Semantic Web</small>
+              </div>
+              <span class="skill-level">STRONG</span>
+            </div>
+            <p class="skill-desc">Semantic document architecture, forms, accessible elements (ARIA), metadata, SEO structure.</p>
+            <div class="skill-meter">
+              <div class="meter-bar" style="--level: 90%;"></div>
+            </div>
+            <div class="skill-tags">
+              <span>Semantic UI</span>
+              <span>Forms</span>
+              <span>Accessibility</span>
+            </div>
+          </div>
+
+          <!-- Skill: CSS3 -->
+          <div class="skill-card" data-category="web">
+            <div class="skill-header">
+              <span class="skill-icon">🎨</span>
+              <div class="skill-meta">
+                <h4>CSS3 &amp; Modern Styling</h4>
+                <small>Responsive Design</small>
+              </div>
+              <span class="skill-level">STRONG</span>
+            </div>
+            <p class="skill-desc">Flexbox, CSS Grid, custom properties, animations, backdrop-filters, media queries, mobile-first design.</p>
+            <div class="skill-meter">
+              <div class="meter-bar" style="--level: 88%;"></div>
+            </div>
+            <div class="skill-tags">
+              <span>CSS Grid</span>
+              <span>Flexbox</span>
+              <span>Glassmorphism</span>
+              <span>Animations</span>
+            </div>
+          </div>
+
+          <!-- Skill: JavaScript -->
+          <div class="skill-card" data-category="web">
+            <div class="skill-header">
+              <span class="skill-icon">📜</span>
+              <div class="skill-meta">
+                <h4>JavaScript (ES6+)</h4>
+                <small>Dynamic Client Logic</small>
+              </div>
+              <span class="skill-level">PROFICIENT</span>
+            </div>
+            <p class="skill-desc">DOM manipulation, event delegation, Async/Promises, Web Audio API, Canvas rendering, dynamic state.</p>
+            <div class="skill-meter">
+              <div class="meter-bar" style="--level: 78%;"></div>
+            </div>
+            <div class="skill-tags">
+              <span>DOM Manipulation</span>
+              <span>ES6+</span>
+              <span>Canvas API</span>
+              <span>Events</span>
+            </div>
+          </div>
+
+          <!-- Skill: Logic & Problem Solving -->
+          <div class="skill-card" data-category="core">
+            <div class="skill-header">
+              <span class="skill-icon">🧠</span>
+              <div class="skill-meta">
+                <h4>Logic &amp; Problem Solving</h4>
+                <small>Algorithmic Foundations</small>
+              </div>
+              <span class="skill-level">CORE FOCUS</span>
+            </div>
+            <p class="skill-desc">Translating real-world problems into algorithmic flowcharts, pseudocode, dry runs, and clean code.</p>
+            <div class="skill-meter">
+              <div class="meter-bar" style="--level: 85%;"></div>
+            </div>
+            <div class="skill-tags">
+              <span>Dry Run</span>
+              <span>Flowcharts</span>
+              <span>Pattern Logic</span>
+            </div>
+          </div>
+
+          <!-- Skill: Data Analysis Basics -->
+          <div class="skill-card" data-category="core">
+            <div class="skill-header">
+              <span class="skill-icon">📊</span>
+              <div class="skill-meta">
+                <h4>Data Analysis Basics</h4>
+                <small>Data Insights</small>
+              </div>
+              <span class="skill-level">EXPLORING</span>
+            </div>
+            <p class="skill-desc">Understanding structured datasets, metric calculations, grade distributions, and business logic.</p>
+            <div class="skill-meter">
+              <div class="meter-bar" style="--level: 65%;"></div>
+            </div>
+            <div class="skill-tags">
+              <span>Metrics</span>
+              <span>Aggregation</span>
+              <span>Reporting</span>
+            </div>
+          </div>
+
+          <!-- Skill: Git & GitHub -->
+          <div class="skill-card" data-category="tools">
+            <div class="skill-header">
+              <span class="skill-icon">🐙</span>
+              <div class="skill-meta">
+                <h4>Git &amp; GitHub</h4>
+                <small>Version Control</small>
+              </div>
+              <span class="skill-level">PRACTICED</span>
+            </div>
+            <p class="skill-desc">Branching, committing, pull requests, GitHub Pages deployment, repository management.</p>
+            <div class="skill-meter">
+              <div class="meter-bar" style="--level: 80%;"></div>
+            </div>
+            <div class="skill-tags">
+              <span>Commits</span>
+              <span>Remotes</span>
+              <span>Pages Deploy</span>
+            </div>
+          </div>
+
+          <!-- Skill: Developer Environment -->
+          <div class="skill-card" data-category="tools">
+            <div class="skill-header">
+              <span class="skill-icon">💻</span>
+              <div class="skill-meta">
+                <h4>VS Code &amp; CLI Tools</h4>
+                <small>Workflow</small>
+              </div>
+              <span class="skill-level">PROFICIENT</span>
+            </div>
+            <p class="skill-desc">Visual Studio Code workflow, GCC compiler toolchain, PowerShell &amp; Bash terminal navigation.</p>
+            <div class="skill-meter">
+              <div class="meter-bar" style="--level: 85%;"></div>
+            </div>
+            <div class="skill-tags">
+              <span>VS Code</span>
+              <span>GCC Compiler</span>
+              <span>PowerShell</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Projects Section with Live Interactive Code Runner -->
+    <section id="projects" class="section projects-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">[04 // CODED SOLUTIONS]</span>
+          <h2 class="section-title">Selected Projects</h2>
+          <p class="section-subtitle">Real programs written in C, web utilities, and concepts built for Smart India Hackathon.</p>
+        </div>
+
+        <!-- Project Filter Controls -->
+        <div class="projects-filter-bar">
+          <button type="button" class="proj-filter-btn active" data-filter="all">All Work (5)</button>
+          <button type="button" class="proj-filter-btn" data-filter="c-lang">C Programming (2)</button>
+          <button type="button" class="proj-filter-btn" data-filter="web-apps">Web &amp; Campus (2)</button>
+          <button type="button" class="proj-filter-btn" data-filter="sih-ideas">SIH 2026 Ideas (1)</button>
+        </div>
+
+        <div class="projects-grid">
+          <!-- Project 1: ATM Banking & Cash Withdrawal System -->
+          <article class="project-cyber-card" data-cat="c-lang">
+            <div class="proj-card-top">
+              <span class="proj-id">PRJ-01 // C LANGUAGE</span>
+              <span class="proj-badge">INTERACTIVE SIMULATION</span>
+            </div>
+            <h3 class="proj-title">ATM Banking &amp; Cash Withdrawal Simulator</h3>
+            <p class="proj-desc">
+              A complete transactional simulation written in C. Features ATM card detection, secure PIN verification, 
+              balance checks, transaction limit enforcement (max ₹20,000), and real-time account debiting.
+            </p>
+            <div class="code-preview-box">
+              <div class="code-header">
+                <span>ATM_WITHDRAWAL.c</span>
+                <span class="lang-tag">C Source</span>
+              </div>
+              <pre><code><span class="c-kw">if</span>(user_pin == pin) {
+    <span class="c-fn">printf</span>(<span class="c-str">"PIN correct. Balance: ₹%.2f\n"</span>, balance);
+    <span class="c-kw">if</span>(amount <= balance &amp;&amp; amount <= 20000) {
+        balance -= amount;
+        <span class="c-fn">printf</span>(<span class="c-str">"Dispensing cash... Remaining: ₹%.2f\n"</span>, balance);
+    }
+}</code></pre>
+            </div>
+            <div class="proj-tags">
+              <span>C Language</span>
+              <span>Conditional Logic</span>
+              <span>Banking Flow</span>
+              <span>Transaction Bounds</span>
+            </div>
+            <div class="proj-card-actions">
+              <button type="button" class="cyber-btn cyber-btn--sm btn-run-atm">
+                <span>⚡ TEST SIMULATION</span>
+              </button>
+              <a href="https://github.com/goyalshiwant8-create" target="_blank" rel="noreferrer" class="text-link-cyber">
+                GitHub <span>↗</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- Project 2: Student Result Management System -->
+          <article class="project-cyber-card" data-cat="c-lang">
+            <div class="proj-card-top">
+              <span class="proj-id">PRJ-02 // C LANGUAGE</span>
+              <span class="proj-badge">C LOGIC</span>
+            </div>
+            <h3 class="proj-title">Student Result Management System</h3>
+            <p class="proj-desc">
+              Academic marks processing tool designed in C for semester evaluations. Collects multi-subject scores, 
+              computes aggregate percentages, detects failing grades, and generates student report cards.
+            </p>
+            <div class="code-preview-box">
+              <div class="code-header">
+                <span>StudentResult.c</span>
+                <span class="lang-tag">C Source</span>
+              </div>
+              <pre><code><span class="c-fn">printf</span>(<span class="c-str">"Calculating aggregate percentage...\n"</span>);
+total = m1 + m2 + m3 + m4 + m5;
+percentage = (total / 500.0) * 100.0;
+<span class="c-fn">printf</span>(<span class="c-str">"Status: %s (%.1f%%)\n"</span>, percentage >= 40 ? <span class="c-str">"PASSED"</span> : <span class="c-str">"FAILED"</span>, percentage);</code></pre>
+            </div>
+            <div class="proj-tags">
+              <span>C Language</span>
+              <span>Input Validation</span>
+              <span>Grade Analysis</span>
+              <span>Academic Tool</span>
+            </div>
+            <div class="proj-card-actions">
+              <button type="button" class="cyber-btn cyber-btn--sm btn-run-result">
+                <span>⚡ TEST CALCULATOR</span>
+              </button>
+              <a href="https://github.com/goyalshiwant8-create" target="_blank" rel="noreferrer" class="text-link-cyber">
+                GitHub <span>↗</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- Project 3: College Utility & Campus Hub -->
+          <article class="project-cyber-card" data-cat="web-apps">
+            <div class="proj-card-top">
+              <span class="proj-id">PRJ-03 // WEB APP</span>
+              <span class="proj-badge">CAMPUS PRODUCTIVITY</span>
+            </div>
+            <h3 class="proj-title">BVIMR College Utility &amp; Student Hub</h3>
+            <p class="proj-desc">
+              A centralized web platform for university students to access class timetables, syllabus notes, 
+              exam schedules, and attendance tracking in a clean, distraction-free interface.
+            </p>
+            <div class="proj-tags">
+              <span>HTML5</span>
+              <span>CSS3 Grid</span>
+              <span>JavaScript</span>
+              <span>Campus Utility</span>
+            </div>
+            <div class="proj-card-actions">
+              <a href="#about" class="cyber-btn cyber-btn--sm"><span>VIEW SPECS</span></a>
+              <a href="https://github.com/goyalshiwant8-create" target="_blank" rel="noreferrer" class="text-link-cyber">
+                GitHub <span>↗</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- Project 4: Cyber-Safe Awareness Portal -->
+          <article class="project-cyber-card" data-cat="web-apps">
+            <div class="proj-card-top">
+              <span class="proj-id">PRJ-04 // SECURITY</span>
+              <span class="proj-badge">CYBERSECURITY</span>
+            </div>
+            <h3 class="proj-title">Cyber-Safe Threat Awareness Portal</h3>
+            <p class="proj-desc">
+              Interactive educational platform demonstrating common phishing attacks, password hygiene principles, 
+              social engineering traps, and practical digital privacy best practices for modern internet users.
+            </p>
+            <div class="proj-tags">
+              <span>Cybersecurity</span>
+              <span>Phishing Simulation</span>
+              <span>Privacy Guide</span>
+              <span>Web Portal</span>
+            </div>
+            <div class="proj-card-actions">
+              <a href="#contact" class="cyber-btn cyber-btn--sm"><span>LEARN MORE</span></a>
+              <a href="https://github.com/goyalshiwant8-create" target="_blank" rel="noreferrer" class="text-link-cyber">
+                GitHub <span>↗</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- Project 5: AI Study Assistant (SIH 2026) -->
+          <article class="project-cyber-card" data-cat="sih-ideas">
+            <div class="proj-card-top">
+              <span class="proj-id">PRJ-05 // SIH 2026 CONCEPT</span>
+              <span class="proj-badge text-accent">HACKATHON INNOVATION</span>
+            </div>
+            <h3 class="proj-title">AI Study Assistant &amp; Exam Roadmapper</h3>
+            <p class="proj-desc">
+              Conceptual hackathon project for Smart India Hackathon 2026. Breaks down dense computer science syllabi into 
+              daily bite-sized logic exercises, active recall prompts, and adaptive revision cycles.
+            </p>
+            <div class="proj-tags">
+              <span>SIH 2026</span>
+              <span>EdTech AI</span>
+              <span>Adaptive Learning</span>
+              <span>Study Roadmaps</span>
+            </div>
+            <div class="proj-card-actions">
+              <a href="#terminal-section" class="cyber-btn cyber-btn--sm" onclick="runCliCmd('sih')"><span>EXPLORE IN TERMINAL</span></a>
+              <a href="https://github.com/goyalshiwant8-create" target="_blank" rel="noreferrer" class="text-link-cyber">
+                SIH Track <span>↗</span>
+              </a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Education & Journey Timeline Section -->
+    <section id="education" class="section education-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">[05 // ROADMAP &amp; MILESTONES]</span>
+          <h2 class="section-title">Education &amp; Journey</h2>
+          <p class="section-subtitle">Academic timeline, courses, developer communities, and milestones.</p>
+        </div>
+
+        <div class="timeline">
+          <!-- Timeline Item 1 -->
+          <div class="timeline-item">
+            <div class="timeline-marker">
+              <span class="marker-dot"></span>
+              <span class="marker-pulse"></span>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-time">2026 &mdash; 2029 (CURRENT)</div>
+              <h3 class="timeline-title">Bachelor of Computer Applications (BCA)</h3>
+              <p class="timeline-org">Bharati Vidyapeeth Institute of Management &amp; Research (BVIMR), New Delhi</p>
+              <p class="timeline-desc">
+                Currently in 1st Semester. Studying foundational C Programming, Principles of Management, Computer Fundamentals, 
+                and Mathematics. Dedicated to mastering data structures and software engineering practices.
+              </p>
+              <div class="timeline-tags">
+                <span>1st Semester</span>
+                <span>C Language</span>
+                <span>Computer Fundamentals</span>
+                <span>BVIMR New Delhi</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Timeline Item 2 -->
+          <div class="timeline-item">
+            <div class="timeline-marker">
+              <span class="marker-dot"></span>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-time">2026 &mdash; ACTIVE</div>
+              <h3 class="timeline-title">Smart India Hackathon (SIH 2026) Initiative</h3>
+              <p class="timeline-org">National Innovation Competition &bull; Team Ideation Track</p>
+              <p class="timeline-desc">
+                Preparing and collaborating on innovative technology solutions addressing real national and student utility challenges. 
+                Focusing on system design, practical architecture, and rapid prototyping.
+              </p>
+              <div class="timeline-tags">
+                <span>Problem Statements</span>
+                <span>Teamwork</span>
+                <span>Rapid Prototyping</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Timeline Item 3 -->
+          <div class="timeline-item">
+            <div class="timeline-marker">
+              <span class="marker-dot"></span>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-time">2026</div>
+              <h3 class="timeline-title">Foundations in Emerging Tech (AIAD &amp; CYWDA)</h3>
+              <p class="timeline-org">Specialized Digital Awareness &amp; Skill Development Courses</p>
+              <p class="timeline-desc">
+                Completed coursework in Artificial Intelligence Awareness and Cyber Warfare Defense Awareness, developing 
+                practical instincts for data protection, threat analysis, and AI ethics.
+              </p>
+              <div class="timeline-tags">
+                <span>AI Foundations</span>
+                <span>Cybersecurity Awareness</span>
+                <span>Digital Hygiene</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Timeline Item 4 -->
+          <div class="timeline-item">
+            <div class="timeline-marker">
+              <span class="marker-dot"></span>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-time">ONGOING</div>
+              <h3 class="timeline-title">Self-Directed Learning &amp; Developer Communities</h3>
+              <p class="timeline-org">GeeksforGeeks, Aman Dhattarwal &bull; Open Tech Practice</p>
+              <p class="timeline-desc">
+                Practicing algorithmic problem solving, watching technical masterclasses, reading computer science documentation, 
+                and building projects from scratch to gain hands-on engineering muscle memory.
+              </p>
+              <div class="timeline-tags">
+                <span>GeeksforGeeks</span>
+                <span>Logic Building</span>
+                <span>Continuous Learning</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Resume Section -->
+    <section id="resume-section" class="section resume-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">[06 // CURRICULUM VITAE]</span>
+          <h2 class="section-title">Developer Resume</h2>
+          <p class="section-subtitle">Snapshot of technical qualifications, educational credentials, and projects.</p>
+        </div>
+
+        <div class="resume-card">
+          <div class="resume-header">
+            <div>
+              <h3 class="resume-name">SHIWANT GOYAL</h3>
+              <p class="resume-subtitle">BCA Student &bull; Aspiring Software Developer &bull; Rohtak / New Delhi, India</p>
+              <p class="resume-contacts">
+                <span>📞 +91 9728010951</span> &bull; 
+                <span>✉️ goyalshiwant8@gmail.com</span> &bull; 
+                <span>🔗 linkedin.com/in/shiwant-goyal</span>
+              </p>
+            </div>
+            <div class="resume-actions">
+              <button type="button" id="download-resume-btn" class="cyber-btn cyber-btn--primary">
+                <span>DOWNLOAD RESUME (.TXT)</span>
+              </button>
+              <button type="button" id="copy-resume-btn" class="cyber-btn cyber-btn--outline">
+                <span>COPY RESUME TEXT</span>
+              </button>
+              <button type="button" id="open-resume-modal-btn" class="cyber-btn cyber-btn--terminal">
+                <span>FULL VIEW MODAL</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="resume-body-preview">
+            <div class="resume-section-block">
+              <h4>OBJECTIVE</h4>
+              <p>Motivated 1st-year BCA student with a solid grounding in C programming, web development (HTML5/CSS3/JavaScript), and algorithmic problem-solving. Seeking opportunities to apply coding skills, contribute to real-world projects, and continuously grow into a high-impact software developer.</p>
+            </div>
+
+            <div class="resume-section-block">
+              <h4>EDUCATION</h4>
+              <div class="resume-item-row">
+                <strong>Bachelor of Computer Applications (BCA)</strong>
+                <span>2026 &mdash; 2029</span>
+              </div>
+              <p>Bharati Vidyapeeth Institute of Management and Research (BVIMR), New Delhi &bull; 1st Semester</p>
+            </div>
+
+            <div class="resume-section-block">
+              <h4>TECHNICAL SKILLS</h4>
+              <p><strong>Languages:</strong> C Programming, C++, Python (Basics), JavaScript (ES6+)</p>
+              <p><strong>Web Technologies:</strong> HTML5, CSS3 (Grid, Flexbox, Animations), Responsive Design</p>
+              <p><strong>Tools &amp; Environments:</strong> Git, GitHub, VS Code, GCC Compiler, Windows PowerShell, Linux Basics</p>
+              <p><strong>Competencies:</strong> Algorithm Design, Debugging, Logic Flowcharts, Team Collaboration</p>
+            </div>
+
+            <div class="resume-section-block">
+              <h4>PROJECT HIGHLIGHTS</h4>
+              <ul>
+                <li><strong>ATM Banking &amp; Cash Withdrawal Simulator (C):</strong> Developed an interactive transaction system with card verification, secure PIN matching, balance inspection, and strict withdrawal limits.</li>
+                <li><strong>Student Result Processing System (C):</strong> Programmed a grade calculator analyzing multi-subject marks and determining academic performance metrics.</li>
+                <li><strong>College Utility Web Hub:</strong> Built a campus assistance web interface streamlining timetable lookups and announcements.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact & Communications Section -->
+    <section id="contact" class="section contact-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">[07 // TRANSMIT MESSAGE]</span>
+          <h2 class="section-title">Get In Touch</h2>
+          <p class="section-subtitle">Have a project, internship opportunity, or hackathon collaboration? Let's connect.</p>
+        </div>
+
+        <div class="contact-grid">
+          <!-- Contact Channels Card -->
+          <div class="contact-info-card">
+            <h3 class="contact-subheading">Direct Channels</h3>
+            <p>I am always open to discussing new software ideas, coding challenges, and collaborative opportunities.</p>
+
+            <div class="channel-list">
+              <a href="mailto:goyalshiwant8@gmail.com" class="channel-item">
+                <span class="channel-icon">✉️</span>
+                <div>
+                  <strong>Email</strong>
+                  <span>goyalshiwant8@gmail.com</span>
+                </div>
+                <span class="channel-arrow">↗</span>
+              </a>
+
+              <a href="tel:+919728010951" class="channel-item">
+                <span class="channel-icon">📱</span>
+                <div>
+                  <strong>Mobile &amp; Phone</strong>
+                  <span>+91 9728010951</span>
+                </div>
+                <span class="channel-arrow">↗</span>
+              </a>
+
+              <a href="https://wa.me/919728010951?text=Hi%20Shiwant,%20I%20saw%20your%20portfolio!" target="_blank" rel="noreferrer" class="channel-item">
+                <span class="channel-icon">💬</span>
+                <div>
+                  <strong>WhatsApp</strong>
+                  <span>Quick Instant Message</span>
+                </div>
+                <span class="channel-arrow">↗</span>
+              </a>
+
+              <a href="https://www.linkedin.com/in/shiwant-goyal" target="_blank" rel="noreferrer" class="channel-item">
+                <span class="channel-icon">💼</span>
+                <div>
+                  <strong>LinkedIn</strong>
+                  <span>linkedin.com/in/shiwant-goyal</span>
+                </div>
+                <span class="channel-arrow">↗</span>
+              </a>
+
+              <a href="https://github.com/goyalshiwant8-create" target="_blank" rel="noreferrer" class="channel-item">
+                <span class="channel-icon">🐙</span>
+                <div>
+                  <strong>GitHub</strong>
+                  <span>github.com/goyalshiwant8-create</span>
+                </div>
+                <span class="channel-arrow">↗</span>
+              </a>
+            </div>
+
+            <div class="location-badge">
+              <span>📍 Based in Rohtak, Haryana &bull; BVIMR New Delhi</span>
+            </div>
+          </div>
+
+          <!-- Dynamic Interactive Contact Form -->
+          <div class="contact-form-wrap">
+            <form id="portfolio-contact-form" class="cyber-form">
+              <div class="form-header">
+                <span class="term-glow">> SEND_MESSAGE.SH</span>
+                <span class="status-pulse"></span>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="contact-name">YOUR NAME *</label>
+                  <input type="text" id="contact-name" name="name" placeholder="John Doe" required />
+                </div>
+                <div class="form-group">
+                  <label for="contact-email">YOUR EMAIL *</label>
+                  <input type="email" id="contact-email" name="email" placeholder="john@example.com" required />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="contact-subject">SUBJECT</label>
+                <input type="text" id="contact-subject" name="subject" placeholder="Project collaboration / Internship / Question" />
+              </div>
+
+              <div class="form-group">
+                <label for="contact-message">TRANSMISSION MESSAGE *</label>
+                <textarea id="contact-message" name="message" rows="4" placeholder="Hello Shiwant, I'd like to talk about..." required></textarea>
+              </div>
+
+              <button type="submit" class="cyber-btn cyber-btn--primary cyber-btn--full">
+                <span>SEND TRANSMISSION</span>
+                <span class="btn-arrow">⚡</span>
+              </button>
+
+              <div id="form-feedback" class="form-feedback" role="status" aria-live="polite"></div>
+            </form>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
-  <footer class="site-footer"><span>© 2026 Shiwant Goyal</span><span>Made for Smart India Hackathon 2026 <b>✦</b></span><a href="#top">Back to top ↑</a></footer>
-  <section id="chat" class="chat-widget" aria-label="Chat with Shiwant" aria-live="polite">
-    <div id="chat-panel" class="chat-panel" aria-hidden="true">
-      <div class="chat-header">
-        <div class="chat-heading-wrap">
-          <span class="chat-status-dot"></span>
-          <div class="chat-heading-text">
-            <strong>Shiwant AI</strong>
-            <small>Online now</small>
+  <!-- Cyber Footer -->
+  <footer class="hud-footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <strong>SHIWANT GOYAL<span>.DEV</span></strong>
+        <p>BCA Student &bull; BVIMR New Delhi &bull; Designed with Vanilla HTML5, CSS3 &amp; JS</p>
+      </div>
+
+      <div class="footer-stats">
+        <div class="footer-stat-item">
+          <small>SIH 2026 STATUS</small>
+          <strong class="text-accent" id="sih-countdown">IN PREPARATION</strong>
+        </div>
+        <div class="footer-stat-item">
+          <small>ENCRYPTION</small>
+          <strong class="text-green">TLS // UTF-8</strong>
+        </div>
+      </div>
+
+      <div class="footer-back-to-top">
+        <a href="#top" class="cyber-btn cyber-btn--sm" title="Scroll back to top">
+          <span>BACK TO TOP ↑</span>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal: ATM Machine Interactive Simulation -->
+  <dialog id="atm-modal" class="cyber-modal" aria-labelledby="atm-modal-title">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-dot"></span>
+          <h3 id="atm-modal-title">ATM Transaction Simulator [C Logic]</h3>
+        </div>
+        <button type="button" class="modal-close-btn" data-close-modal="atm-modal" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="atm-screen">
+          <div class="atm-screen-header">
+            <span>BHARATI CO-OP BANK &bull; ATM TERMINAL</span>
+            <span class="atm-clock" id="atm-clock">21:49:00</span>
+          </div>
+          <div class="atm-display-text" id="atm-display">
+            WELCOME TO SHIWANT ATM SYSTEM.<br />
+            STEP 1: INSERT CARD OR ENTER CARD PIN (DEFAULT: 1234)
           </div>
         </div>
-        <button class="chat-close" type="button" aria-label="Close chat">×</button>
+
+        <div class="atm-controls">
+          <div class="atm-input-group">
+            <label for="atm-input-field">KEYPAD INPUT:</label>
+            <input type="number" id="atm-input-field" placeholder="Enter PIN or amount..." />
+          </div>
+          <div class="atm-btn-row">
+            <button type="button" id="atm-btn-pin" class="cyber-btn cyber-btn--sm">ENTER PIN (1234)</button>
+            <button type="button" id="atm-btn-bal" class="cyber-btn cyber-btn--sm">CHECK BALANCE</button>
+            <button type="button" id="atm-btn-withdraw" class="cyber-btn cyber-btn--sm">WITHDRAW AMOUNT</button>
+            <button type="button" id="atm-btn-reset" class="cyber-btn cyber-btn--outline cyber-btn--sm">RESET</button>
+          </div>
+        </div>
       </div>
-      <div class="chat-messages" aria-label="Chat messages">
-        <div class="chat-message chat-message--bot">Hi! I’m Shiwant’s AI assistant. Ask me about his projects, skills, goals, or how to connect with him.</div>
+    </div>
+  </dialog>
+
+  <!-- Modal: Student Result Calculator Simulation -->
+  <dialog id="result-modal" class="cyber-modal" aria-labelledby="result-modal-title">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-dot"></span>
+          <h3 id="result-modal-title">Student Result Processing System [C Logic]</h3>
+        </div>
+        <button type="button" class="modal-close-btn" data-close-modal="result-modal" aria-label="Close dialog">&times;</button>
       </div>
-      <div class="chat-suggestions" aria-label="Suggested questions">
-        <button type="button" class="chat-prompt">About Shiwant</button>
-        <button type="button" class="chat-prompt">Skills</button>
-        <button type="button" class="chat-prompt">Projects</button>
-        <button type="button" class="chat-prompt">Contact</button>
+      <div class="modal-body">
+        <p class="modal-desc">Test the marks calculation algorithm from <code>studentresultsystem.c</code>.</p>
+        <div class="marks-form-grid">
+          <div class="marks-input-group">
+            <label for="mark-1">C Programming (m1):</label>
+            <input type="number" id="mark-1" min="0" max="100" value="88" />
+          </div>
+          <div class="marks-input-group">
+            <label for="mark-2">Web Technologies (m2):</label>
+            <input type="number" id="mark-2" min="0" max="100" value="92" />
+          </div>
+          <div class="marks-input-group">
+            <label for="mark-3">Computer Fundamentals (m3):</label>
+            <input type="number" id="mark-3" min="0" max="100" value="85" />
+          </div>
+          <div class="marks-input-group">
+            <label for="mark-4">Mathematics (m4):</label>
+            <input type="number" id="mark-4" min="0" max="100" value="79" />
+          </div>
+          <div class="marks-input-group">
+            <label for="mark-5">Principles of Mgmt (m5):</label>
+            <input type="number" id="mark-5" min="0" max="100" value="84" />
+          </div>
+        </div>
+        <button type="button" id="calc-result-btn" class="cyber-btn cyber-btn--primary cyber-btn--full">
+          <span>CALCULATE ACADEMIC REPORT</span>
+        </button>
+        <div class="result-display-box" id="result-output">
+          Click the button above to calculate marks, percentage, and grade status.
+        </div>
       </div>
-      <form class="chat-form">
-        <label class="sr-only" for="chat-input">Write a message</label>
-        <input id="chat-input" type="text" placeholder="Write a message..." autocomplete="off" />
-        <button class="chat-send" type="submit" aria-label="Send message">↗</button>
+    </div>
+  </dialog>
+
+  <!-- Modal: Full Developer Resume -->
+  <dialog id="resume-modal" class="cyber-modal cyber-modal--large" aria-labelledby="resume-modal-title">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-dot"></span>
+          <h3 id="resume-modal-title">Shiwant Goyal &mdash; Full Developer Resume</h3>
+        </div>
+        <button type="button" class="modal-close-btn" data-close-modal="resume-modal" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="modal-body resume-modal-scroll">
+        <div class="printable-resume">
+          <div class="res-head">
+            <h2>SHIWANT GOYAL</h2>
+            <p>BCA Student &bull; Aspiring Software Developer &bull; Rohtak / New Delhi</p>
+            <p>Phone: +91 9728010951 | Email: goyalshiwant8@gmail.com | GitHub: github.com/goyalshiwant8-create</p>
+          </div>
+          <hr />
+          <h3>PROFESSIONAL SUMMARY</h3>
+          <p>
+            Enthusiastic and dedicated 1st-year Bachelor of Computer Applications (BCA) student at Bharati Vidyapeeth Institute 
+            of Management and Research (BVIMR), New Delhi. Solid foundational expertise in C programming, modern semantic HTML5, 
+            CSS3 styling, and JavaScript logic. Driven by problem-solving and actively targeting the Smart India Hackathon (SIH 2026).
+          </p>
+          <h3>EDUCATION</h3>
+          <p><strong>Bachelor of Computer Applications (BCA)</strong> &mdash; <em>2026 - 2029</em><br />Bharati Vidyapeeth Institute of Management &amp; Research, New Delhi</p>
+          <h3>TECHNICAL PROFICIENCIES</h3>
+          <p><strong>Languages:</strong> C Programming, C++, Python (Fundamentals), JavaScript (ES6+)<br />
+          <strong>Web Development:</strong> Semantic HTML5, CSS3 (Grid, Flexbox, Animations), DOM Manipulation<br />
+          <strong>Core Competencies:</strong> Logic Design, Flowcharting, Code Debugging, Algorithm Dry Runs<br />
+          <strong>Tools:</strong> VS Code, Git, GitHub, GCC Compiler, Windows PowerShell, Terminal</p>
+          <h3>KEY PROJECTS</h3>
+          <p><strong>ATM Transaction &amp; Withdrawal System (C Language)</strong><br />
+          Engineered an end-to-end interactive terminal banking simulator implementing PIN authentication, dynamic balance adjustment, and withdrawal safety thresholds.</p>
+          <p><strong>Student Result Processing System (C Language)</strong><br />
+          Designed an academic calculation suite that processes multi-subject performance, generates percentage aggregates, and flags academic standing.</p>
+          <p><strong>College Utility &amp; Student Hub (Web Portal)</strong><br />
+          Constructed a responsive campus portal to streamline timetable lookups and announcements for students.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="cyber-btn cyber-btn--primary" id="modal-download-btn">DOWNLOAD RESUME</button>
+        <button type="button" class="cyber-btn cyber-btn--outline" data-close-modal="resume-modal">CLOSE</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Interactive Floating AI Assistant Widget -->
+  <aside id="chat-widget" class="floating-ai-widget" aria-label="Shiwant Cyber AI Assistant">
+    <div id="ai-chat-window" class="ai-chat-window" aria-hidden="true">
+      <div class="ai-chat-header">
+        <div class="ai-chat-status">
+          <span class="status-dot"></span>
+          <div>
+            <strong>SHIWANT_AI // BOT</strong>
+            <small>Active &bull; Ask me anything</small>
+          </div>
+        </div>
+        <button type="button" id="close-chat-btn" class="ai-chat-close" aria-label="Close Chat">&times;</button>
+      </div>
+
+      <div class="ai-chat-messages" id="chat-messages" role="log" aria-live="polite">
+        <div class="chat-msg chat-msg--bot">
+          Hello! I’m Shiwant’s AI companion. Ask me about his BCA studies at BVIMR, his C &amp; Web projects, SIH 2026 goals, or how to get in touch!
+        </div>
+      </div>
+
+      <div class="ai-chat-suggestions">
+        <button type="button" class="chat-suggestion-chip" data-query="Who is Shiwant?">Who is Shiwant?</button>
+        <button type="button" class="chat-suggestion-chip" data-query="What are his skills?">Skills</button>
+        <button type="button" class="chat-suggestion-chip" data-query="Tell me about his projects">Projects</button>
+        <button type="button" class="chat-suggestion-chip" data-query="How to contact him?">Contact</button>
+        <button type="button" class="chat-suggestion-chip" data-query="What is SIH 2026?">SIH 2026</button>
+      </div>
+
+      <form id="ai-chat-form" class="ai-chat-input-row">
+        <input type="text" id="ai-chat-input" placeholder="Ask a question..." autocomplete="off" />
+        <button type="submit" class="ai-chat-send-btn" aria-label="Send message">⚡</button>
       </form>
     </div>
-    <button class="chat-launcher" type="button" aria-expanded="false" aria-controls="chat-panel" aria-label="Open chat"><span class="chat-launcher-icon">✦</span><span class="chat-launcher-label">Chat</span></button>
-  </section>
+
+    <button id="chat-toggle-launcher" class="chat-launcher-btn" type="button" aria-expanded="false" aria-controls="ai-chat-window">
+      <span class="launcher-pulse"></span>
+      <span class="launcher-icon">🤖</span>
+      <span class="launcher-text">AI ASSISTANT</span>
+    </button>
+  </aside>
+
+  <!-- Toast Notification Center -->
+  <div id="cyber-toast" class="cyber-toast" role="status" aria-live="polite"></div>
+
+  <!-- JavaScript -->
   <script src="script.js"></script>
 </body>
 </html>
