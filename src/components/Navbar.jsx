@@ -6,13 +6,32 @@
  * sound toggle, mobile responsive drawer, and prominent "Let's Connect" CTA.
  */
 
-function Navbar({ breathingStyle, setBreathingStyle, sfxEnabled, onToggleSfx, activeSection }) {
+function Navbar({ breathingStyle, setBreathingStyle, sfxEnabled, onToggleSfx, activeSection, onOpenQuiz, onOpenShortcuts }) {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
   const [themeDropdownOpen, setThemeDropdownOpen] = React.useState(false);
+  const [currentTime, setCurrentTime] = React.useState("");
 
   const { personal, breathingStyles } = window.portfolioData || {};
   const currentStyleData = breathingStyles ? breathingStyles[breathingStyle] : null;
+
+  // Real-time Delhi IST clock
+  React.useEffect(() => {
+    const updateClock = () => {
+      const now = new Date();
+      const timeFormatter = new Intl.DateTimeFormat("en-US", {
+        timeZone: "Asia/Kolkata",
+        hour: "numeric",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+      });
+      setCurrentTime(timeFormatter.format(now));
+    };
+    updateClock();
+    const timer = setInterval(updateClock, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -173,15 +192,55 @@ function Navbar({ breathingStyle, setBreathingStyle, sfxEnabled, onToggleSfx, ac
             )}
           </div>
 
+          {/* Live Indian Standard Time & Status */}
+          {currentTime && (
+            <div className="hidden xl:flex items-center gap-2 px-3 py-1 rounded-lg bg-white/[0.04] border border-white/10 text-xs font-mono text-gray-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="text-[11px] text-gray-400">Delhi:</span>
+              <span className="text-cyan-300 font-semibold">{currentTime}</span>
+              <span className="text-[10px] text-gray-500 font-sans">IST</span>
+            </div>
+          )}
+
+          {/* Interactive Demon Slayer Rank Quiz Button */}
+          {onOpenQuiz && (
+            <button
+              onClick={() => {
+                if (window.soundManager) window.soundManager.playKatanaChime();
+                onOpenQuiz();
+              }}
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/40 hover:border-emerald-400/70 text-xs font-mono text-emerald-300 transition-all hover:scale-105 active:scale-95 shadow-sm"
+              title="Test Your Developer Rank with 3 Quick Challenges"
+            >
+              <span className="text-xs">⚔️</span>
+              <span className="hidden md:inline">Rank Test</span>
+            </button>
+          )}
+
           {/* Sound FX Toggle */}
           <button
             onClick={onToggleSfx}
             className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white transition-colors"
-            title={sfxEnabled ? "Audio Effects: On" : "Audio Effects: Muted"}
+            title={sfxEnabled ? "Audio Effects: On (Press M)" : "Audio Effects: Muted (Press M)"}
             aria-label="Toggle sound effects"
           >
             <span className="text-sm">{sfxEnabled ? "🔊" : "🔇"}</span>
           </button>
+
+          {/* Keyboard Shortcuts Helper */}
+          {onOpenShortcuts && (
+            <button
+              onClick={() => {
+                if (window.soundManager) window.soundManager.playClick();
+                onOpenShortcuts();
+              }}
+              className="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 hover:text-white text-xs font-mono transition-colors"
+              title="Keyboard Shortcuts (Press ?)"
+              aria-label="View keyboard shortcuts"
+            >
+              ?
+            </button>
+          )}
 
           {/* Prominent "Let's Connect" CTA Button */}
           <a

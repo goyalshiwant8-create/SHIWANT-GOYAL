@@ -65,16 +65,35 @@ function Contact({ breathingStyle, onShowToast }) {
 
     setIsSubmitting(true);
 
+    // Save message locally to history
+    try {
+      const existing = JSON.parse(localStorage.getItem("shiwant_sent_messages") || "[]");
+      existing.unshift({
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+        timestamp: new Date().toISOString(),
+      });
+      localStorage.setItem("shiwant_sent_messages", JSON.stringify(existing));
+    } catch (e) {}
+
     // Simulate reliable submission
     setTimeout(() => {
       setIsSubmitting(false);
       setSubmitted(true);
-      if (window.soundManager) window.soundManager.playKatanaChime();
+      if (window.soundManager) window.soundManager.playSuccess();
       if (onShowToast) {
         onShowToast("Message transmitted! Shiwant will get back to you soon. ⚔️");
       }
       setFormData({ name: "", email: "", message: "" });
-    }, 800);
+    }, 700);
+  };
+
+  const handleLaunchMailClient = () => {
+    const targetEmail = socials?.email?.address || "your-email@example.com";
+    const subject = encodeURIComponent(`Portfolio Inquiry from ${formData.name || "Visitor"}`);
+    const body = encodeURIComponent(formData.message || "Hi Shiwant,\n\nI visited your portfolio and wanted to connect!");
+    window.location.href = `mailto:${targetEmail}?subject=${subject}&body=${body}`;
   };
 
   const handleCopyEmail = () => {

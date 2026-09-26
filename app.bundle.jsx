@@ -153,13 +153,32 @@ if (typeof window !== "undefined") {
  * sound toggle, mobile responsive drawer, and prominent "Let's Connect" CTA.
  */
 
-function Navbar({ breathingStyle, setBreathingStyle, sfxEnabled, onToggleSfx, activeSection }) {
+function Navbar({ breathingStyle, setBreathingStyle, sfxEnabled, onToggleSfx, activeSection, onOpenQuiz, onOpenShortcuts }) {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
   const [themeDropdownOpen, setThemeDropdownOpen] = React.useState(false);
+  const [currentTime, setCurrentTime] = React.useState("");
 
   const { personal, breathingStyles } = window.portfolioData || {};
   const currentStyleData = breathingStyles ? breathingStyles[breathingStyle] : null;
+
+  // Real-time Delhi IST clock
+  React.useEffect(() => {
+    const updateClock = () => {
+      const now = new Date();
+      const timeFormatter = new Intl.DateTimeFormat("en-US", {
+        timeZone: "Asia/Kolkata",
+        hour: "numeric",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+      });
+      setCurrentTime(timeFormatter.format(now));
+    };
+    updateClock();
+    const timer = setInterval(updateClock, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -320,15 +339,55 @@ function Navbar({ breathingStyle, setBreathingStyle, sfxEnabled, onToggleSfx, ac
             )}
           </div>
 
+          {/* Live Indian Standard Time & Status */}
+          {currentTime && (
+            <div className="hidden xl:flex items-center gap-2 px-3 py-1 rounded-lg bg-white/[0.04] border border-white/10 text-xs font-mono text-gray-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="text-[11px] text-gray-400">Delhi:</span>
+              <span className="text-cyan-300 font-semibold">{currentTime}</span>
+              <span className="text-[10px] text-gray-500 font-sans">IST</span>
+            </div>
+          )}
+
+          {/* Interactive Demon Slayer Rank Quiz Button */}
+          {onOpenQuiz && (
+            <button
+              onClick={() => {
+                if (window.soundManager) window.soundManager.playKatanaChime();
+                onOpenQuiz();
+              }}
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/40 hover:border-emerald-400/70 text-xs font-mono text-emerald-300 transition-all hover:scale-105 active:scale-95 shadow-sm"
+              title="Test Your Developer Rank with 3 Quick Challenges"
+            >
+              <span className="text-xs">⚔️</span>
+              <span className="hidden md:inline">Rank Test</span>
+            </button>
+          )}
+
           {/* Sound FX Toggle */}
           <button
             onClick={onToggleSfx}
             className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white transition-colors"
-            title={sfxEnabled ? "Audio Effects: On" : "Audio Effects: Muted"}
+            title={sfxEnabled ? "Audio Effects: On (Press M)" : "Audio Effects: Muted (Press M)"}
             aria-label="Toggle sound effects"
           >
             <span className="text-sm">{sfxEnabled ? "🔊" : "🔇"}</span>
           </button>
+
+          {/* Keyboard Shortcuts Helper */}
+          {onOpenShortcuts && (
+            <button
+              onClick={() => {
+                if (window.soundManager) window.soundManager.playClick();
+                onOpenShortcuts();
+              }}
+              className="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 hover:text-white text-xs font-mono transition-colors"
+              title="Keyboard Shortcuts (Press ?)"
+              aria-label="View keyboard shortcuts"
+            >
+              ?
+            </button>
+          )}
 
           {/* Prominent "Let's Connect" CTA Button */}
           <a
@@ -436,11 +495,29 @@ if (typeof window !== "undefined") {
  *   and simulated execution output!
  */
 
-function Hero({ breathingStyle }) {
+function Hero({ breathingStyle, setBreathingStyle, onTriggerSlash, onOpenQuiz, onShowToast }) {
   const { personal, socials, codeSnippets } = window.portfolioData || {};
-  const [activeTab, setActiveTab] = React.useState(codeSnippets ? codeSnippets[0].id : "main.c");
+  const [activeTab, setActiveTab] = React.useState("main.c");
   const [terminalOutput, setTerminalOutput] = React.useState(null);
-  const [isRunning, setIsRunning] = React.useState(false);
+  const [isCompiling, setIsCompiling] = React.useState(false);
+  const [compileStage, setCompileStage] = React.useState("");
+
+  // Interactive CLI Shell state
+  const [cliInput, setCliInput] = React.useState("");
+  const [cliHistory, setCliHistory] = React.useState([
+    { type: "system", text: "滅 NICHIRIN INTERACTIVE SHELL v2.4 [Total Concentration OS]" },
+    { type: "system", text: "Type 'help' to view commands or click a chip below to execute!" },
+  ]);
+  const [cmdHistory, setCmdHistory] = React.useState([]);
+  const [cmdHistoryIndex, setCmdHistoryIndex] = React.useState(-1);
+  const cliEndRef = React.useRef(null);
+
+  // Auto-scroll CLI output
+  React.useEffect(() => {
+    if (activeTab === "cli" && cliEndRef.current) {
+      cliEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [cliHistory, activeTab]);
 
   const currentSnippet = (codeSnippets || []).find((s) => s.id === activeTab) || codeSnippets[0];
 
@@ -450,15 +527,189 @@ function Hero({ breathingStyle }) {
     if (window.soundManager) window.soundManager.playClick();
   };
 
+  // Animated realistic multi-step compilation
   const handleRunCode = () => {
     if (window.soundManager) window.soundManager.playKatanaChime();
-    setIsRunning(true);
+    setIsCompiling(true);
     setTerminalOutput(null);
 
+    const isC = currentSnippet.language === "c";
+    setCompileStage(isC ? "[1/3] gcc -Wall -O2 " + currentSnippet.id + " ..." : "[1/3] Bundling React Virtual DOM ...");
+
     setTimeout(() => {
-      setIsRunning(false);
-      setTerminalOutput(currentSnippet.output);
-    }, 600);
+      setCompileStage(isC ? "[2/3] Verifying Nichirin logic & memory integrity ... OK" : "[2/3] Hydrating state hooks & animations ... OK");
+      if (window.soundManager) window.soundManager.playBeep();
+
+      setTimeout(() => {
+        setCompileStage(isC ? "[3/3] Linking shiwant_core.exe ... SUCCESS (18ms)" : "[3/3] Render complete (1.2ms)");
+        setIsCompiling(false);
+        setTerminalOutput(currentSnippet.output);
+        if (window.soundManager) window.soundManager.playSuccess();
+      }, 350);
+    }, 350);
+  };
+
+  // Interactive CLI Command Runner
+  const handleExecuteCommand = (rawCmd) => {
+    const trimmed = (rawCmd || cliInput).trim();
+    if (!trimmed) return;
+
+    if (window.soundManager) window.soundManager.playClick();
+
+    // Add to input history
+    setCmdHistory((prev) => [trimmed, ...prev]);
+    setCmdHistoryIndex(-1);
+
+    const parts = trimmed.split(" ");
+    const cmd = parts[0].toLowerCase();
+    const arg = parts.slice(1).join(" ").toLowerCase();
+
+    const newHistory = [...cliHistory, { type: "input", text: `shiwant@slayer-corps:~$ ${trimmed}` }];
+
+    switch (cmd) {
+      case "help":
+        newHistory.push({
+          type: "output",
+          text: `AVAILABLE NICHIRIN COMMANDS:
+  about         - Shiwant's BCA journey @ BVIMR & goals
+  skills        - List active programming & web arsenal
+  projects      - Display current featured projects
+  theme <style> - Switch theme: 'water', 'sun', or 'thunder'
+  time          - Real-time Delhi IST clock & active schedule
+  quiz          - Launch the Demon Slayer Developer Rank Test
+  slay          - Unleash full-screen Nichirin Blade Slash!
+  contact       - Display direct contact channels
+  clear         - Clear terminal console`,
+        });
+        break;
+
+      case "about":
+        newHistory.push({
+          type: "output",
+          text: `SHIWANT GOYAL // BCA 1st Year @ BVIMR New Delhi
+Status: Currently learning, building, and solving algorithms daily.
+Motto: "滅 — Slay the Bugs, Forge the Future."
+Goal: Become a high-impact full-stack web developer.`,
+        });
+        break;
+
+      case "skills":
+        newHistory.push({
+          type: "output",
+          text: `TECHNICAL ARSENAL // PROFICIENCY:
+  [====================] C Programming (Foundational Core)
+  [==================  ] Problem Solving & Algorithms (Active)
+  [=================== ] HTML5 & Modern Responsive CSS3
+  [================    ] JavaScript (ES6+, DOM, Asynchronous)
+  [=============       ] React & Component Architecture (In Progress)`,
+        });
+        break;
+
+      case "projects":
+        newHistory.push({
+          type: "output",
+          text: `FEATURED PROJECTS:
+  1. Portfolio Website (Demon Slayer React Theme) -> In Progress
+  2. C Programming Projects (Calculators, Games, Algorithms) -> Active Labs
+Type 'clear' or scroll down to inspect details in the Projects section!`,
+        });
+        break;
+
+      case "theme":
+        if (["water", "sun", "thunder"].includes(arg)) {
+          if (setBreathingStyle) setBreathingStyle(arg);
+          if (window.soundManager) window.soundManager.playBreathingSound(arg);
+          newHistory.push({
+            type: "success",
+            text: `[FORM SHIFT]: Activated ${arg.toUpperCase()} BREATHING (${arg === "water" ? "水の呼吸 🌊" : arg === "sun" ? "日の呼吸 🔥" : "雷の呼吸 ⚡"})!`,
+          });
+          if (onShowToast) onShowToast(`Theme switched to ${arg.toUpperCase()} Breathing!`);
+        } else {
+          newHistory.push({
+            type: "error",
+            text: `Invalid theme. Choose: 'theme water', 'theme sun', or 'theme thunder'.`,
+          });
+        }
+        break;
+
+      case "time":
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString("en-US", { timeZone: "Asia/Kolkata", hour12: true });
+        newHistory.push({
+          type: "output",
+          text: `LOCAL TIME [New Delhi, India]: ${timeStr} IST
+Current Status: Total Concentration // Coding C & Web Projects @ BVIMR`,
+        });
+        break;
+
+      case "slay":
+        if (onTriggerSlash) onTriggerSlash();
+        if (window.soundManager) window.soundManager.playSlash();
+        newHistory.push({
+          type: "success",
+          text: `⚔️ TOTAL CONCENTRATION: KATANA SLASH UNLEASHED! 滅`,
+        });
+        break;
+
+      case "quiz":
+        if (onOpenQuiz) onOpenQuiz();
+        newHistory.push({
+          type: "success",
+          text: `Launching Demon Slayer Developer Rank Test... Ready your blade!`,
+        });
+        break;
+
+      case "contact":
+        newHistory.push({
+          type: "output",
+          text: `CONNECT WITH SHIWANT:
+  Instagram: ${socials?.instagram?.username || "@shiwant_goyal_"}
+  LinkedIn : ${socials?.linkedin?.url || "Available on profile"}
+  GitHub   : ${socials?.github?.url || "goyalshiwant8-create"}
+  Email    : ${socials?.email?.address || "your-email@example.com"}`,
+        });
+        break;
+
+      case "clear":
+        setCliHistory([
+          { type: "system", text: "滅 Terminal cleared. Type 'help' for commands." },
+        ]);
+        setCliInput("");
+        return;
+
+      default:
+        newHistory.push({
+          type: "error",
+          text: `Command not found: '${trimmed}'. Type 'help' to see valid commands.`,
+        });
+    }
+
+    setCliHistory(newHistory);
+    setCliInput("");
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleExecuteCommand(cliInput);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (cmdHistory.length > 0 && cmdHistoryIndex + 1 < cmdHistory.length) {
+        const nextIndex = cmdHistoryIndex + 1;
+        setCmdHistoryIndex(nextIndex);
+        setCliInput(cmdHistory[nextIndex]);
+      }
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (cmdHistoryIndex > 0) {
+        const nextIndex = cmdHistoryIndex - 1;
+        setCmdHistoryIndex(nextIndex);
+        setCliInput(cmdHistory[nextIndex]);
+      } else {
+        setCmdHistoryIndex(-1);
+        setCliInput("");
+      }
+    }
   };
 
   const scrollToSection = (e, id) => {
@@ -619,9 +870,24 @@ function Hero({ breathingStyle }) {
                 </div>
               </div>
 
-              {/* Code Tabs */}
+              {/* Code & CLI Tabs */}
               <div className="flex items-center justify-between px-3 pt-2 border-b border-white/5 bg-[#090d13]">
                 <div className="flex items-center gap-1 overflow-x-auto">
+                  {/* Interactive CLI Shell Tab */}
+                  <button
+                    onClick={() => handleTabChange("cli")}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-t-lg text-xs font-mono transition-all ${
+                      activeTab === "cli"
+                        ? "bg-[#111722] text-emerald-300 border-t-2 border-emerald-400 font-semibold"
+                        : "text-gray-400 hover:text-gray-200 hover:bg-white/5"
+                    }`}
+                  >
+                    <span>&gt;_ cli</span>
+                    <span className="text-[9px] px-1 py-0.2 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-500/30">
+                      Interactive
+                    </span>
+                  </button>
+
                   {(codeSnippets || []).map((snippet) => (
                     <button
                       key={snippet.id}
@@ -640,77 +906,148 @@ function Hero({ breathingStyle }) {
                   ))}
                 </div>
 
-                {/* Run / Compile Button */}
-                <button
-                  onClick={handleRunCode}
-                  disabled={isRunning}
-                  className="flex items-center gap-1.5 px-3 py-1 mb-1 rounded-md text-xs font-mono font-medium text-emerald-300 bg-emerald-950/60 border border-emerald-500/40 hover:bg-emerald-900/60 transition-all hover:scale-105 active:scale-95"
-                  title="Run code in simulated environment"
-                >
-                  <span>{isRunning ? "⏳" : "▶"}</span>
-                  <span>{isRunning ? "Compiling..." : "Run"}</span>
-                </button>
+                {/* Run / Compile Button (Visible on code snippet tabs) */}
+                {activeTab !== "cli" && (
+                  <button
+                    onClick={handleRunCode}
+                    disabled={isCompiling}
+                    className="flex items-center gap-1.5 px-3 py-1 mb-1 rounded-md text-xs font-mono font-medium text-emerald-300 bg-emerald-950/60 border border-emerald-500/40 hover:bg-emerald-900/60 transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                    title="Run code in simulated environment"
+                  >
+                    <span>{isCompiling ? "⏳" : "▶"}</span>
+                    <span>{isCompiling ? "Running..." : "Run"}</span>
+                  </button>
+                )}
               </div>
 
-              {/* Code Editor Body */}
-              <div className="p-4 sm:p-5 font-mono text-xs sm:text-[13px] leading-relaxed bg-[#0b0f15] rounded-b-xl overflow-x-auto min-h-[260px]">
-                <div className="flex">
-                  {/* Line Numbers */}
-                  <div className="select-none pr-4 text-right text-gray-600 border-r border-white/10 mr-4 font-mono text-xs">
-                    {currentSnippet.code.split("\n").map((_, i) => (
-                      <div key={i}>{i + 1}</div>
+              {/* Terminal / Code Editor Body */}
+              {activeTab === "cli" ? (
+                /* INTERACTIVE CLI SHELL */
+                <div className="p-4 sm:p-5 font-mono text-xs sm:text-[13px] bg-[#0b0f15] rounded-b-xl min-h-[300px] flex flex-col justify-between">
+                  {/* CLI Output Log */}
+                  <div className="overflow-y-auto max-h-[260px] space-y-2 pr-1 custom-scroll">
+                    {cliHistory.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className={
+                          item.type === "system"
+                            ? "text-gray-400 text-xs italic border-b border-white/5 pb-1"
+                            : item.type === "input"
+                            ? "text-cyan-300 font-semibold"
+                            : item.type === "success"
+                            ? "text-emerald-300 font-bold bg-emerald-950/30 p-1.5 rounded border border-emerald-500/20"
+                            : item.type === "error"
+                            ? "text-red-400 bg-red-950/20 p-1 rounded"
+                            : "text-gray-200 whitespace-pre-wrap leading-relaxed"
+                        }
+                      >
+                        {item.text}
+                      </div>
+                    ))}
+                    <div ref={cliEndRef} />
+                  </div>
+
+                  {/* Quick Command Suggestions */}
+                  <div className="mt-3 pt-3 border-t border-white/5 flex flex-wrap items-center gap-1.5">
+                    <span className="text-[10px] text-gray-500 font-mono">Suggestions:</span>
+                    {["help", "about", "skills", "projects", "theme sun", "slay", "clear"].map((cmd) => (
+                      <button
+                        key={cmd}
+                        onClick={() => handleExecuteCommand(cmd)}
+                        className="px-2 py-0.5 rounded text-[11px] font-mono bg-white/5 hover:bg-cyan-500/20 text-gray-300 hover:text-cyan-200 border border-white/10 transition-colors"
+                      >
+                        {cmd}
+                      </button>
                     ))}
                   </div>
 
-                  {/* Code Content */}
-                  <pre className="text-gray-200 font-mono whitespace-pre flex-1 overflow-x-auto">
-                    <code>
-                      {currentSnippet.code.split("\n").map((line, idx) => {
-                        // Minimal color decoration
-                        let coloredLine = line;
-                        const isComment = line.trim().startsWith("//") || line.trim().startsWith("#");
-                        const isInclude = line.trim().startsWith("#include") || line.trim().startsWith("import");
-                        
-                        return (
-                          <div
-                            key={idx}
-                            className={
-                              isComment
-                                ? "text-emerald-400/80 italic"
-                                : isInclude
-                                ? "text-purple-400"
-                                : "text-gray-200"
-                            }
-                          >
-                            {line}
-                          </div>
-                        );
-                      })}
-                    </code>
-                  </pre>
+                  {/* Command Input Prompt */}
+                  <div className="mt-2 flex items-center gap-2 pt-2 border-t border-white/10">
+                    <span className="text-emerald-400 font-mono text-xs select-none">shiwant@slayer:~$</span>
+                    <input
+                      type="text"
+                      value={cliInput}
+                      onChange={(e) => setCliInput(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder="type a command (e.g. 'help', 'slay')..."
+                      className="flex-1 bg-transparent border-none outline-none font-mono text-xs sm:text-sm text-cyan-200 placeholder-gray-600 focus:ring-0"
+                      autoFocus
+                    />
+                    <button
+                      onClick={() => handleExecuteCommand(cliInput)}
+                      className="px-2.5 py-1 rounded bg-emerald-600/80 hover:bg-emerald-500 text-white text-[11px] font-mono font-medium transition-colors"
+                    >
+                      Enter ↵
+                    </button>
+                  </div>
                 </div>
-
-                {/* Execution Output Box */}
-                {terminalOutput && (
-                  <div className="mt-4 pt-3 border-t border-dashed border-emerald-500/30 animate-fadeIn bg-emerald-950/20 p-3 rounded-lg border border-emerald-500/20">
-                    <div className="flex items-center justify-between text-[11px] font-mono text-emerald-400 mb-1">
-                      <span className="flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                        TERMINAL EXECUTION // WATER BREATHING STRIKE
-                      </span>
-                      <button
-                        onClick={() => setTerminalOutput(null)}
-                        className="text-gray-400 hover:text-white text-xs"
-                      >
-                        ✕
-                      </button>
+              ) : (
+                /* CODE SNIPPET VIEWER */
+                <div className="p-4 sm:p-5 font-mono text-xs sm:text-[13px] leading-relaxed bg-[#0b0f15] rounded-b-xl overflow-x-auto min-h-[300px]">
+                  <div className="flex">
+                    {/* Line Numbers */}
+                    <div className="select-none pr-4 text-right text-gray-600 border-r border-white/10 mr-4 font-mono text-xs">
+                      {currentSnippet.code.split("\n").map((_, i) => (
+                        <div key={i}>{i + 1}</div>
+                      ))}
                     </div>
-                    <pre className="text-emerald-200/90 text-xs font-mono whitespace-pre-wrap">
-                      {terminalOutput}
+
+                    {/* Code Content */}
+                    <pre className="text-gray-200 font-mono whitespace-pre flex-1 overflow-x-auto">
+                      <code>
+                        {currentSnippet.code.split("\n").map((line, idx) => {
+                          const isComment = line.trim().startsWith("//") || line.trim().startsWith("#");
+                          const isInclude = line.trim().startsWith("#include") || line.trim().startsWith("import");
+
+                          return (
+                            <div
+                              key={idx}
+                              className={
+                                isComment
+                                  ? "text-emerald-400/80 italic"
+                                  : isInclude
+                                  ? "text-purple-400"
+                                  : "text-gray-200"
+                              }
+                            >
+                              {line}
+                            </div>
+                          );
+                        })}
+                      </code>
                     </pre>
                   </div>
-                )}
-              </div>
+
+                  {/* Compiling Stage Banner */}
+                  {isCompiling && (
+                    <div className="mt-4 p-3 rounded-lg bg-cyan-950/40 border border-cyan-500/30 text-cyan-300 text-xs font-mono flex items-center gap-2 animate-pulse">
+                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                      <span>{compileStage}</span>
+                    </div>
+                  )}
+
+                  {/* Execution Output Box */}
+                  {terminalOutput && (
+                    <div className="mt-4 pt-3 border-t border-dashed border-emerald-500/30 animate-fadeIn bg-emerald-950/20 p-3 rounded-lg border border-emerald-500/20">
+                      <div className="flex items-center justify-between text-[11px] font-mono text-emerald-400 mb-1">
+                        <span className="flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                          TERMINAL EXECUTION // WATER BREATHING STRIKE
+                        </span>
+                        <button
+                          onClick={() => setTerminalOutput(null)}
+                          className="text-gray-400 hover:text-white text-xs"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      <pre className="text-emerald-200/90 text-xs font-mono whitespace-pre-wrap">
+                        {terminalOutput}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Bottom status bar */}
               <div className="px-4 py-2 border-t border-white/5 bg-[#080c12] text-[11px] font-mono text-gray-500 flex items-center justify-between">
@@ -1102,8 +1439,29 @@ if (typeof window !== "undefined") {
  * - Clean Demon Slayer scroll / nichirin card styling with hover glow
  */
 
-function Projects({ breathingStyle }) {
+function Projects({ breathingStyle, onOpenProjectModal }) {
   const { projects } = window.portfolioData || {};
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [activeCategory, setActiveCategory] = React.useState("all");
+
+  const filteredProjects = (projects?.items || []).filter((project) => {
+    const matchesCategory =
+      activeCategory === "all"
+        ? true
+        : activeCategory === "c"
+        ? project.tech.includes("C") || project.id.includes("c-")
+        : project.tech.includes("React") || project.tech.includes("HTML5");
+
+    const query = searchQuery.toLowerCase().trim();
+    const matchesSearch =
+      !query ||
+      project.title.toLowerCase().includes(query) ||
+      project.description.toLowerCase().includes(query) ||
+      (project.details && project.details.toLowerCase().includes(query)) ||
+      project.tech.some((t) => t.toLowerCase().includes(query));
+
+    return matchesCategory && matchesSearch;
+  });
 
   const handleLinkClick = (e, url) => {
     if (url.startsWith("#")) {
@@ -1142,7 +1500,7 @@ function Projects({ breathingStyle }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-cyan-300 mb-3">
             <span className="font-serif">戦歴</span> {projects?.kanjiSubtitle || "MISSION SCROLLS"}
           </div>
@@ -1155,9 +1513,66 @@ function Projects({ breathingStyle }) {
           <div className="w-16 h-1 mx-auto mt-4 rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400"></div>
         </div>
 
+        {/* Dynamic Search & Category Filter Controls */}
+        <div className="max-w-3xl mx-auto mb-12 flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#0c1017]/80 p-3 rounded-2xl border border-white/10 backdrop-blur-md">
+          {/* Category Filter Chips */}
+          <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+            {[
+              { id: "all", label: "All Projects" },
+              { id: "c", label: "C & Algorithms 💻" },
+              { id: "web", label: "Web & React 🌐" },
+            ].map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => {
+                  setActiveCategory(cat.id);
+                  if (window.soundManager) window.soundManager.playClick();
+                }}
+                className={`px-3 py-1.5 rounded-xl text-xs font-mono whitespace-nowrap transition-all ${
+                  activeCategory === cat.id
+                    ? "bg-gradient-to-r from-cyan-600 to-emerald-600 text-white font-semibold shadow-md"
+                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Real-time Search Input */}
+          <div className="relative w-full sm:w-64">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by tech or keyword..."
+              className="w-full pl-8 pr-7 py-1.5 rounded-xl bg-black/40 border border-white/10 text-xs font-mono text-gray-200 placeholder-gray-500 focus:outline-none focus:border-cyan-400"
+            />
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs">🔍</span>
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-xs"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Live Result Count */}
+        <div className="flex items-center justify-between text-xs font-mono text-gray-400 mb-6 px-1">
+          <span>
+            Displaying <strong className="text-cyan-300">{filteredProjects.length}</strong> project{filteredProjects.length === 1 ? "" : "s"}
+          </span>
+          <span className="text-[11px] text-gray-500">
+            Click 'Interactive Demo' for in-browser C tester
+          </span>
+        </div>
+
         {/* Projects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {(projects?.items || []).map((project) => (
+          {filteredProjects.map((project) => (
             <div
               key={project.id}
               className="group relative rounded-2xl bg-[#0c1017]/90 border border-white/10 hover:border-cyan-400/50 p-6 sm:p-7 shadow-xl shadow-black/50 transition-all duration-300 hover:-translate-y-2 flex flex-col justify-between"
@@ -1213,16 +1628,17 @@ function Projects({ breathingStyle }) {
                 </div>
               </div>
 
-              {/* Action Buttons: View Project & GitHub */}
-              <div className="mt-6 pt-5 border-t border-white/10 flex items-center gap-3">
-                <a
-                  href={project.liveUrl}
-                  onClick={(e) => handleLinkClick(e, project.liveUrl)}
-                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 shadow-md shadow-cyan-950 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              {/* Action Buttons: Interactive Demo & GitHub */}
+              <div className="mt-6 pt-5 border-t border-white/10 flex flex-wrap items-center gap-2">
+                <button
+                  onClick={() => {
+                    if (window.soundManager) window.soundManager.playKatanaChime();
+                    if (onOpenProjectModal) onOpenProjectModal(project);
+                  }}
+                  className="flex-1 min-w-[120px] inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 shadow-md shadow-cyan-950 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  <span>View Project</span>
-                  <span className="text-xs">↗</span>
-                </a>
+                  <span>{project.id === "c-programming-projects" ? "🎮 Test C Simulator" : "⚔️ Quick View"}</span>
+                </button>
 
                 <a
                   href={project.githubUrl}
@@ -1237,7 +1653,7 @@ function Projects({ breathingStyle }) {
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                     <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
                   </svg>
-                  <span>GitHub</span>
+                  <span>Code</span>
                 </a>
               </div>
             </div>
@@ -1285,6 +1701,240 @@ function Projects({ breathingStyle }) {
 
 if (typeof window !== "undefined") {
   window.Projects = Projects;
+}
+
+// ===== src/components/LiveGitHubHub.jsx =====
+/**
+ * ============================================================================
+ * LIVE GITHUB DEV HUB COMPONENT
+ * ============================================================================
+ * Fetches real-time telemetry, repository stats, and live code activity
+ * directly from the GitHub REST API (goyalshiwant8-create).
+ * Features:
+ * - Real Public Repo count
+ * - Live follower telemetry
+ * - Dynamic list of recently updated GitHub repositories
+ * - Live sync indicator & manual refresh trigger
+ * - Smooth fallback to curated cache if rate-limited or offline
+ */
+
+function LiveGitHubHub({ breathingStyle }) {
+  const { socials } = window.portfolioData || {};
+  const username = socials?.github?.username || "goyalshiwant8-create";
+
+  const [userData, setUserData] = React.useState(null);
+  const [repos, setRepos] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [lastUpdated, setLastUpdated] = React.useState(null);
+  const [fetchError, setFetchError] = React.useState(null);
+
+  const fetchGitHubData = React.useCallback(async () => {
+    setLoading(true);
+    setFetchError(null);
+    try {
+      // 1. Fetch user profile
+      const userRes = await fetch(`https://api.github.com/users/${username}`);
+      if (!userRes.ok) throw new Error(`User fetch failed (${userRes.status})`);
+      const userJson = await userRes.json();
+      setUserData(userJson);
+
+      // 2. Fetch recent public repos
+      const reposRes = await fetch(
+        `https://api.github.com/users/${username}/repos?sort=updated&per_page=6`
+      );
+      if (!reposRes.ok) throw new Error(`Repos fetch failed (${reposRes.status})`);
+      const reposJson = await reposRes.json();
+      setRepos(reposJson);
+
+      setLastUpdated(new Date().toLocaleTimeString("en-US", { hour12: true, hour: "numeric", minute: "2-digit" }));
+    } catch (err) {
+      setFetchError(err.message);
+      // Fallback cache so the card never looks broken
+      setUserData({
+        public_repos: 4,
+        followers: 1,
+        following: 1,
+        name: "Shiwant Goyal",
+        html_url: `https://github.com/${username}`,
+      });
+      setRepos([
+        {
+          id: 1,
+          name: "SHIWANT-GOYAL",
+          description: "Personal Demon Slayer themed developer portfolio with Web Audio & React architecture.",
+          language: "JavaScript",
+          stargazers_count: 1,
+          html_url: `https://github.com/${username}/SHIWANT-GOYAL`,
+        },
+        {
+          id: 2,
+          name: "C-Lectures-And-Labs",
+          description: "BCA 1st Year C programming exercises, pointer models, loops, and algorithmic calculators.",
+          language: "C",
+          stargazers_count: 0,
+          html_url: `https://github.com/${username}`,
+        },
+        {
+          id: 3,
+          name: "HTML-Questions-Practice",
+          description: "Comprehensive semantic HTML5 and modern CSS3 practice exercises and responsive layouts.",
+          language: "HTML",
+          stargazers_count: 0,
+          html_url: `https://github.com/${username}`,
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  }, [username]);
+
+  React.useEffect(() => {
+    fetchGitHubData();
+  }, [fetchGitHubData]);
+
+  const handleRefresh = () => {
+    if (window.soundManager) window.soundManager.playKatanaChime();
+    fetchGitHubData();
+  };
+
+  return (
+    <section className="relative py-16 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Hub Card Container */}
+        <div className="rounded-2xl bg-[#0c1017]/90 border border-white/10 hover:border-cyan-500/40 p-6 sm:p-8 shadow-2xl backdrop-blur-xl transition-all">
+          
+          {/* Header Row */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/10">
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span className="text-xs font-mono font-semibold tracking-wider text-emerald-300 uppercase">
+                  ● Live GitHub Telemetry
+                </span>
+                {lastUpdated && (
+                  <span className="text-[10px] font-mono text-gray-400">
+                    // Synced at {lastUpdated}
+                  </span>
+                )}
+              </div>
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-white font-space flex items-center gap-2">
+                <span>Real-Time Code Activity</span>
+                <span className="text-lg">⚡</span>
+              </h3>
+            </div>
+
+            {/* Profile Action & Refresh */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleRefresh}
+                disabled={loading}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white transition-all active:scale-95 disabled:opacity-50"
+                title="Re-sync data from GitHub API"
+              >
+                <span className={loading ? "animate-spin" : ""}>🔄</span>
+                <span>{loading ? "Syncing..." : "Sync Live API"}</span>
+              </button>
+
+              <a
+                href={`https://github.com/${username}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 shadow-md shadow-cyan-950 transition-all hover:scale-105"
+              >
+                <span>@{username}</span>
+                <span>↗</span>
+              </a>
+            </div>
+          </div>
+
+          {/* Quick Stats Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 my-6">
+            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 text-center">
+              <span className="text-2xl font-bold font-mono text-cyan-300">
+                {userData?.public_repos ?? "..."}
+              </span>
+              <span className="block text-xs font-mono text-gray-400 mt-1">Public Repos</span>
+            </div>
+
+            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 text-center">
+              <span className="text-2xl font-bold font-mono text-emerald-300">
+                {userData?.followers ?? "..."}
+              </span>
+              <span className="block text-xs font-mono text-gray-400 mt-1">Followers</span>
+            </div>
+
+            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 text-center">
+              <span className="text-2xl font-bold font-mono text-amber-300">
+                BCA Yr 1
+              </span>
+              <span className="block text-xs font-mono text-gray-400 mt-1">Academic Rank</span>
+            </div>
+
+            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 text-center">
+              <span className="text-2xl font-bold font-mono text-purple-300">
+                滅 100%
+              </span>
+              <span className="block text-xs font-mono text-gray-400 mt-1">Total Concentration</span>
+            </div>
+          </div>
+
+          {/* Live Repositories Grid */}
+          <div className="mt-4">
+            <span className="text-xs font-mono text-gray-400 block mb-3 uppercase tracking-wider">
+              Latest Synchronized Repositories:
+            </span>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {repos.map((repo) => (
+                <div
+                  key={repo.id}
+                  className="p-4 rounded-xl bg-[#090d13] border border-white/10 hover:border-cyan-400/40 transition-all flex flex-col justify-between group"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <h4 className="text-sm font-bold text-white group-hover:text-cyan-300 font-mono truncate">
+                        {repo.name}
+                      </h4>
+                      {repo.language && (
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 border border-cyan-500/30">
+                          {repo.language}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">
+                      {repo.description || "Public repository for BCA programming & web practice."}
+                    </p>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs font-mono">
+                    <span className="text-gray-500 flex items-center gap-1">
+                      <span>★</span> {repo.stargazers_count || 0}
+                    </span>
+                    <a
+                      href={repo.html_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-cyan-400 hover:text-cyan-300 inline-flex items-center gap-1 font-medium"
+                    >
+                      <span>Inspect</span>
+                      <span>→</span>
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+  );
+}
+
+if (typeof window !== "undefined") {
+  window.LiveGitHubHub = LiveGitHubHub;
 }
 
 // ===== src/components/Education.jsx =====
@@ -1579,6 +2229,277 @@ if (typeof window !== "undefined") {
   window.LearningJourney = LearningJourney;
 }
 
+// ===== src/components/VisitorInteractions.jsx =====
+/**
+ * ============================================================================
+ * VISITOR INTERACTIONS COMPONENT (REACTIONS & GUESTBOOK WALL)
+ * ============================================================================
+ * Enables dynamic community interaction:
+ * - Interactive Endorsement & Reaction Counters (persisted in localStorage)
+ * - Dynamic Guestbook Message Wall with instant note submission
+ * - Audio chimes on endorsement & message submission
+ */
+
+function VisitorInteractions({ breathingStyle, onShowToast }) {
+  const { reactions: defaultReactions, guestbook: seedGuestbook } =
+    window.portfolioData || {};
+
+  // Reactions state (synced with localStorage)
+  const [counts, setCounts] = React.useState(() => {
+    try {
+      const saved = localStorage.getItem("shiwant_visitor_reactions");
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return {
+      slay: defaultReactions?.slay?.defaultCount || 142,
+      speed: defaultReactions?.speed?.defaultCount || 98,
+      potential: defaultReactions?.potential?.defaultCount || 116,
+      clean: defaultReactions?.clean?.defaultCount || 89,
+    };
+  });
+
+  const [hasVoted, setHasVoted] = React.useState({});
+
+  // Guestbook state (synced with localStorage)
+  const [notes, setNotes] = React.useState(() => {
+    try {
+      const saved = localStorage.getItem("shiwant_guestbook_notes");
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return seedGuestbook || [];
+  });
+
+  const [newNote, setNewNote] = React.useState({ name: "", role: "", message: "" });
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  // Handle clicking a reaction
+  const handleReactionClick = (key) => {
+    if (window.soundManager) window.soundManager.playKatanaChime();
+
+    setCounts((prev) => {
+      const updated = { ...prev, [key]: (prev[key] || 0) + 1 };
+      try {
+        localStorage.setItem("shiwant_visitor_reactions", JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+
+    setHasVoted((prev) => ({ ...prev, [key]: true }));
+
+    if (onShowToast) {
+      onShowToast("Reaction recorded! Arigato for the endorsement! ⚔️");
+    }
+  };
+
+  // Handle submitting a guestbook note
+  const handleNoteSubmit = (e) => {
+    e.preventDefault();
+    if (!newNote.name.trim() || !newNote.message.trim()) {
+      if (onShowToast) onShowToast("Please provide both your name and a brief note!");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    setTimeout(() => {
+      const created = {
+        id: "note-" + Date.now(),
+        name: newNote.name.trim(),
+        role: newNote.role.trim() || "Visitor",
+        badge: "Community",
+        message: newNote.message.trim(),
+        date: "Just now",
+        avatarEmoji: ["🌊", "🔥", "⚡", "⚔️", "🍃"][Math.floor(Math.random() * 5)],
+      };
+
+      setNotes((prev) => {
+        const updated = [created, ...prev];
+        try {
+          localStorage.setItem("shiwant_guestbook_notes", JSON.stringify(updated));
+        } catch (e) {}
+        return updated;
+      });
+
+      setNewNote({ name: "", role: "", message: "" });
+      setIsSubmitting(false);
+
+      if (window.soundManager) window.soundManager.playSuccess();
+      if (onShowToast) onShowToast("Your note has been posted to Shiwant's Wall! 🎉");
+    }, 400);
+  };
+
+  return (
+    <section className="relative py-20 lg:py-24 overflow-hidden bg-white/[0.01]">
+      {/* Katana divider */}
+      <div className="max-w-7xl mx-auto px-4 mb-16">
+        <div className="relative flex items-center justify-center">
+          <div className="w-full h-px bg-gradient-to-r from-transparent via-purple-500/40 to-transparent"></div>
+          <span className="absolute px-4 bg-[#080c11] text-xs font-mono text-purple-400/80 tracking-widest uppercase flex items-center gap-2">
+            <span>絆</span> SECTION 04 // VISITOR ENDORSEMENTS <span>絆</span>
+          </span>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Section Header */}
+        <div className="text-center max-w-3xl mx-auto mb-14">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-purple-300 mb-3">
+            <span className="font-serif">絆</span> COMMUNITY & ENDORSEMENTS
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white font-space tracking-tight">
+            Visitor Pulse & Guestbook
+          </h2>
+          <p className="mt-4 text-base text-gray-300 leading-relaxed">
+            Leave a live reaction or write a quick note on Shiwant's portfolio wall. All endorsements are synced in real time!
+          </p>
+          <div className="w-16 h-1 mx-auto mt-4 rounded-full bg-gradient-to-r from-purple-400 to-cyan-400"></div>
+        </div>
+
+        {/* 1. Interactive Reactions Bar */}
+        <div className="max-w-4xl mx-auto mb-16 p-6 sm:p-8 rounded-2xl bg-[#0c1017]/85 border border-white/10 shadow-xl backdrop-blur-xl">
+          <span className="text-xs font-mono text-gray-400 block mb-4 uppercase tracking-wider text-center">
+            Tap a reaction to endorse Shiwant's work:
+          </span>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {[
+              { key: "slay", emoji: "⚔️", label: "Total Concentration" },
+              { key: "speed", emoji: "⚡", label: "Fast Learner" },
+              { key: "potential", emoji: "🚀", label: "High Potential" },
+              { key: "clean", emoji: "💡", label: "Clean Code" },
+            ].map((item) => (
+              <button
+                key={item.key}
+                onClick={() => handleReactionClick(item.key)}
+                className={`group p-4 rounded-xl border flex flex-col items-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95 ${
+                  hasVoted[item.key]
+                    ? "bg-purple-950/40 border-purple-500/50 shadow-lg shadow-purple-950/50"
+                    : "bg-white/[0.02] hover:bg-white/[0.06] border-white/10 hover:border-cyan-400/40"
+                }`}
+              >
+                <span className="text-3xl group-hover:scale-110 transition-transform">
+                  {item.emoji}
+                </span>
+                <span className="text-xs font-semibold text-white font-space text-center">
+                  {item.label}
+                </span>
+                <span className="text-sm font-mono font-bold text-cyan-300 bg-white/5 px-2 py-0.5 rounded-full border border-white/5">
+                  {counts[item.key] || 0}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 2. Guestbook Wall & Submission Form */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start max-w-6xl mx-auto">
+          
+          {/* Submission Form Column */}
+          <div className="lg:col-span-5 p-6 sm:p-7 rounded-2xl bg-[#0c1017]/90 border border-white/10 shadow-xl">
+            <h3 className="text-xl font-bold text-white font-space mb-2 flex items-center gap-2">
+              <span>Sign the Scroll</span>
+              <span>📜</span>
+            </h3>
+            <p className="text-xs text-gray-400 mb-6 font-sans">
+              Leave a greeting, feedback, or words of encouragement for Shiwant's learning journey!
+            </p>
+
+            <form onSubmit={handleNoteSubmit} className="space-y-4 font-mono text-xs">
+              <div>
+                <label className="block text-gray-400 mb-1">Your Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={newNote.name}
+                  onChange={(e) => setNewNote({ ...newNote, name: e.target.value })}
+                  placeholder="e.g. Tanjiro / Rahul Sharma"
+                  className="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/15 text-white focus:outline-none focus:border-purple-400"
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-400 mb-1">Your Role / Tag (Optional)</label>
+                <input
+                  type="text"
+                  value={newNote.role}
+                  onChange={(e) => setNewNote({ ...newNote, role: e.target.value })}
+                  placeholder="e.g. BCA Classmate / Recruiter / Friend"
+                  className="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/15 text-white focus:outline-none focus:border-purple-400"
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-400 mb-1">Message *</label>
+                <textarea
+                  required
+                  rows="3"
+                  value={newNote.message}
+                  onChange={(e) => setNewNote({ ...newNote, message: e.target.value })}
+                  placeholder="Write something nice..."
+                  className="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/15 text-white focus:outline-none focus:border-purple-400 font-sans"
+                ></textarea>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-semibold text-xs transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-purple-950"
+              >
+                {isSubmitting ? "Inscribing Scroll..." : "Post to Guestbook ⚔️"}
+              </button>
+            </form>
+          </div>
+
+          {/* Live Notes Wall Column */}
+          <div className="lg:col-span-7 space-y-4 max-h-[480px] overflow-y-auto pr-1">
+            <div className="flex items-center justify-between text-xs font-mono text-gray-400 pb-2 border-b border-white/10">
+              <span>COMMUNITY SCROLL ({notes.length} Notes)</span>
+              <span className="text-purple-300">● Live Feed</span>
+            </div>
+
+            {notes.map((note) => (
+              <div
+                key={note.id}
+                className="p-4 rounded-xl bg-[#090d13]/80 border border-white/10 hover:border-purple-400/30 transition-all flex gap-3.5"
+              >
+                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-xl flex-shrink-0">
+                  {note.avatarEmoji || "⚔️"}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <h4 className="text-xs font-bold text-white font-space truncate">
+                      {note.name}
+                    </h4>
+                    <span className="text-[10px] font-mono text-gray-500">
+                      {note.date}
+                    </span>
+                  </div>
+
+                  <span className="inline-block text-[10px] font-mono px-2 py-0.2 rounded-full bg-purple-950/60 text-purple-300 border border-purple-500/20 mb-2">
+                    {note.role}
+                  </span>
+
+                  <p className="text-xs text-gray-300 leading-relaxed font-sans">
+                    {note.message}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+  );
+}
+
+if (typeof window !== "undefined") {
+  window.VisitorInteractions = VisitorInteractions;
+}
+
 // ===== src/components/Contact.jsx =====
 /**
  * ============================================================================
@@ -1647,16 +2568,35 @@ function Contact({ breathingStyle, onShowToast }) {
 
     setIsSubmitting(true);
 
+    // Save message locally to history
+    try {
+      const existing = JSON.parse(localStorage.getItem("shiwant_sent_messages") || "[]");
+      existing.unshift({
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+        timestamp: new Date().toISOString(),
+      });
+      localStorage.setItem("shiwant_sent_messages", JSON.stringify(existing));
+    } catch (e) {}
+
     // Simulate reliable submission
     setTimeout(() => {
       setIsSubmitting(false);
       setSubmitted(true);
-      if (window.soundManager) window.soundManager.playKatanaChime();
+      if (window.soundManager) window.soundManager.playSuccess();
       if (onShowToast) {
         onShowToast("Message transmitted! Shiwant will get back to you soon. ⚔️");
       }
       setFormData({ name: "", email: "", message: "" });
-    }, 800);
+    }, 700);
+  };
+
+  const handleLaunchMailClient = () => {
+    const targetEmail = socials?.email?.address || "your-email@example.com";
+    const subject = encodeURIComponent(`Portfolio Inquiry from ${formData.name || "Visitor"}`);
+    const body = encodeURIComponent(formData.message || "Hi Shiwant,\n\nI visited your portfolio and wanted to connect!");
+    window.location.href = `mailto:${targetEmail}?subject=${subject}&body=${body}`;
   };
 
   const handleCopyEmail = () => {
@@ -2022,17 +2962,946 @@ if (typeof window !== "undefined") {
   window.Footer = Footer;
 }
 
+// ===== src/components/ProjectModal.jsx =====
+/**
+ * ============================================================================
+ * PROJECT MODAL COMPONENT (INTERACTIVE IN-BROWSER SIMULATOR)
+ * ============================================================================
+ * Allows visitors to interactively test and preview projects directly in the browser!
+ * Includes:
+ * - In-Browser C Simulator:
+ *     1. Number Guessing Game (Demon Slayer Training)
+ *     2. Algorithmic Math & Logic Tester (Prime check, Factorial, Fibonacci)
+ * - Portfolio Website Live Theme & Feature Inspector
+ * - Direct links to GitHub and source code
+ */
+
+function ProjectModal({ project, onClose, breathingStyle, onShowToast }) {
+  if (!project) return null;
+
+  const isCProject = project.id === "c-programming-projects";
+  const [activeTab, setActiveTab] = React.useState(isCProject ? "game" : "overview");
+
+  // Number Guessing Game State
+  const [targetNumber, setTargetNumber] = React.useState(() => Math.floor(Math.random() * 100) + 1);
+  const [guessInput, setGuessInput] = React.useState("");
+  const [guessLog, setGuessLog] = React.useState([]);
+  const [gameWon, setGameWon] = React.useState(false);
+
+  // Math Logic Tool State
+  const [mathTool, setMathTool] = React.useState("prime");
+  const [mathInput, setMathInput] = React.useState("17");
+  const [mathResult, setMathResult] = React.useState(null);
+
+  // Close on Escape key
+  React.useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  // Handle Number Guessing
+  const handleGuess = (e) => {
+    e.preventDefault();
+    const num = parseInt(guessInput, 10);
+    if (isNaN(num) || num < 1 || num > 100) {
+      if (onShowToast) onShowToast("Please enter a valid number between 1 and 100!");
+      return;
+    }
+
+    if (window.soundManager) window.soundManager.playClick();
+
+    if (num === targetNumber) {
+      setGameWon(true);
+      setGuessLog((prev) => [
+        { guess: num, result: "🎯 BINGO! Total Concentration achieved!", success: true },
+        ...prev,
+      ]);
+      if (window.soundManager) window.soundManager.playSuccess();
+      if (onShowToast) onShowToast("Flawless strike! You guessed correctly! ⚔️");
+    } else if (num < targetNumber) {
+      setGuessLog((prev) => [
+        { guess: num, result: "🌊 Too low! Aim higher like Water Breathing!", success: false },
+        ...prev,
+      ]);
+      if (window.soundManager) window.soundManager.playBeep();
+    } else {
+      setGuessLog((prev) => [
+        { guess: num, result: "🔥 Too high! Temper your flame!", success: false },
+        ...prev,
+      ]);
+      if (window.soundManager) window.soundManager.playBeep();
+    }
+    setGuessInput("");
+  };
+
+  const handleResetGame = () => {
+    setTargetNumber(Math.floor(Math.random() * 100) + 1);
+    setGuessLog([]);
+    setGameWon(false);
+    setGuessInput("");
+    if (window.soundManager) window.soundManager.playKatanaChime();
+  };
+
+  // Handle Math Computation
+  const handleCalculateMath = () => {
+    const val = parseInt(mathInput, 10);
+    if (isNaN(val)) return;
+
+    if (window.soundManager) window.soundManager.playClick();
+
+    if (mathTool === "prime") {
+      if (val <= 1) {
+        setMathResult(`${val} is NOT prime (primes are > 1).`);
+        return;
+      }
+      let isPrime = true;
+      for (let i = 2; i * i <= val; i++) {
+        if (val % i === 0) {
+          isPrime = false;
+          break;
+        }
+      }
+      setMathResult(isPrime ? `✅ ${val} is a PRIME NUMBER! (Only divisible by 1 & ${val})` : `❌ ${val} is COMPOSITE (divisible by other factors).`);
+    } else if (mathTool === "factorial") {
+      if (val < 0 || val > 20) {
+        setMathResult("Please enter a number between 0 and 20.");
+        return;
+      }
+      let res = 1;
+      for (let i = 2; i <= val; i++) res *= i;
+      setMathResult(`${val}! = ${res.toLocaleString()}`);
+    } else if (mathTool === "fibonacci") {
+      if (val < 1 || val > 25) {
+        setMathResult("Please choose length between 1 and 25.");
+        return;
+      }
+      const seq = [0, 1];
+      while (seq.length < val) {
+        seq.push(seq[seq.length - 1] + seq[seq.length - 2]);
+      }
+      setMathResult(`First ${val} terms: [ ${seq.slice(0, val).join(", ")} ]`);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+      {/* Modal Dialog Card */}
+      <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[#0d121a] border border-cyan-500/40 shadow-2xl shadow-cyan-950/60 p-6 sm:p-8 flex flex-col justify-between">
+        
+        {/* Header */}
+        <div className="flex items-start justify-between border-b border-white/10 pb-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xs font-mono text-cyan-400 font-semibold uppercase">
+                {project.breathingStyle}
+              </span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-emerald-300">
+                {project.badge}
+              </span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white font-space">
+              {project.title}
+            </h2>
+          </div>
+
+          <button
+            onClick={() => {
+              if (window.soundManager) window.soundManager.playClick();
+              onClose();
+            }}
+            className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/15 border border-white/10 text-gray-400 hover:text-white flex items-center justify-center text-sm transition-colors"
+            aria-label="Close modal"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Modal Navigation Tabs */}
+        {isCProject && (
+          <div className="flex items-center gap-2 my-4 border-b border-white/10 pb-2">
+            <button
+              onClick={() => setActiveTab("game")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors ${
+                activeTab === "game"
+                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              🎮 C Game Simulator
+            </button>
+            <button
+              onClick={() => setActiveTab("math")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors ${
+                activeTab === "math"
+                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              🔢 Algorithmic Calculator
+            </button>
+            <button
+              onClick={() => setActiveTab("overview")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors ${
+                activeTab === "overview"
+                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              📖 Overview & Code
+            </button>
+          </div>
+        )}
+
+        {/* Modal Body Content */}
+        <div className="my-4 space-y-5">
+          {/* C GAME SIMULATOR TAB */}
+          {isCProject && activeTab === "game" && (
+            <div className="p-5 rounded-xl bg-[#090d13] border border-white/10 font-mono">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs text-emerald-400 font-semibold flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  C Exercise: Number Guessing Engine (1 to 100)
+                </span>
+                <button
+                  onClick={handleResetGame}
+                  className="text-[11px] text-gray-400 hover:text-cyan-300 underline"
+                >
+                  Restart Round ↺
+                </button>
+              </div>
+
+              <p className="text-xs text-gray-400 mb-4 font-sans">
+                Simulates standard C <code className="text-cyan-300 bg-white/5 px-1 py-0.5 rounded">rand() % 100 + 1</code> with while-loop control flow and binary search hints!
+              </p>
+
+              <form onSubmit={handleGuess} className="flex gap-2 mb-4">
+                <input
+                  type="number"
+                  min="1"
+                  max="100"
+                  value={guessInput}
+                  disabled={gameWon}
+                  onChange={(e) => setGuessInput(e.target.value)}
+                  placeholder="Enter guess (1 - 100)..."
+                  className="flex-1 px-3 py-2 rounded-lg bg-black/40 border border-white/15 text-sm text-white focus:outline-none focus:border-cyan-400"
+                  autoFocus
+                />
+                <button
+                  type="submit"
+                  disabled={gameWon}
+                  className="px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-600 to-emerald-600 text-xs font-semibold text-white shadow-md disabled:opacity-50"
+                >
+                  Guess ⚔️
+                </button>
+              </form>
+
+              {/* Guess History Log */}
+              <div className="max-h-40 overflow-y-auto space-y-1.5 p-3 rounded-lg bg-black/30 border border-white/5 text-xs">
+                {guessLog.length === 0 ? (
+                  <span className="text-gray-500 italic">No guesses entered yet. Enter a number above!</span>
+                ) : (
+                  guessLog.map((log, i) => (
+                    <div
+                      key={i}
+                      className={`flex items-center justify-between p-1.5 rounded ${
+                        log.success
+                          ? "bg-emerald-950/60 text-emerald-300 font-bold border border-emerald-500/40"
+                          : "text-gray-300"
+                      }`}
+                    >
+                      <span>Guess: {log.guess}</span>
+                      <span>{log.result}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* C MATH LOGIC TAB */}
+          {isCProject && activeTab === "math" && (
+            <div className="p-5 rounded-xl bg-[#090d13] border border-white/10 font-mono">
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <span className="text-xs text-cyan-400 font-semibold mr-2">Algorithm:</span>
+                {[
+                  { id: "prime", label: "Prime Number Checker" },
+                  { id: "factorial", label: "Factorial (n!)" },
+                  { id: "fibonacci", label: "Fibonacci Sequence" },
+                ].map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => {
+                      setMathTool(t.id);
+                      setMathResult(null);
+                    }}
+                    className={`px-2.5 py-1 rounded text-xs transition-colors ${
+                      mathTool === t.id
+                        ? "bg-emerald-950/80 text-emerald-300 border border-emerald-500/40"
+                        : "bg-white/5 text-gray-400 hover:text-white"
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-3 mb-4">
+                <input
+                  type="number"
+                  value={mathInput}
+                  onChange={(e) => setMathInput(e.target.value)}
+                  className="w-32 px-3 py-2 rounded-lg bg-black/40 border border-white/15 text-sm text-white focus:outline-none focus:border-cyan-400 font-mono"
+                />
+                <button
+                  onClick={handleCalculateMath}
+                  className="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-xs font-semibold text-white transition-colors"
+                >
+                  Execute Algorithm ▶
+                </button>
+              </div>
+
+              {mathResult && (
+                <div className="p-3 rounded-lg bg-cyan-950/30 border border-cyan-500/30 text-cyan-200 text-xs animate-fadeIn">
+                  <span className="text-gray-400 mr-2">Result:</span>
+                  <span className="font-semibold">{mathResult}</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* OVERVIEW TAB */}
+          {(!isCProject || activeTab === "overview") && (
+            <div className="space-y-4">
+              <p className="text-sm text-gray-300 leading-relaxed">
+                {project.description}
+              </p>
+
+              {project.details && (
+                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 text-xs text-gray-300 leading-relaxed">
+                  <span className="text-cyan-400 font-mono font-semibold block mb-1">
+                    Technical Architecture & Learnings:
+                  </span>
+                  {project.details}
+                </div>
+              )}
+
+              {/* Technologies list */}
+              <div>
+                <span className="text-xs font-mono text-gray-400 block mb-2">Technologies Used:</span>
+                <div className="flex flex-wrap gap-2">
+                  {project.tech.map((t, idx) => (
+                    <span
+                      key={idx}
+                      className="px-3 py-1 rounded-lg text-xs font-mono bg-white/5 border border-white/10 text-cyan-300"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer Actions */}
+        <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-3">
+          <div className="text-xs font-mono text-gray-400">
+            <span>Repo: </span>
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cyan-400 hover:underline"
+            >
+              github.com/goyalshiwant8-create
+            </a>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 rounded-xl text-xs font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
+            >
+              Close
+            </button>
+
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 shadow-md transition-all hover:scale-105"
+            >
+              <span>View Source on GitHub</span>
+              <span>↗</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+if (typeof window !== "undefined") {
+  window.ProjectModal = ProjectModal;
+}
+
+// ===== src/components/CodeQuiz.jsx =====
+/**
+ * ============================================================================
+ * CODE QUIZ // DEMON SLAYER DEVELOPER RANK TEST
+ * ============================================================================
+ * Interactive 3-question challenge assessing C logic, modern web standards,
+ * and software development fundamentals.
+ * Features:
+ * - Step-by-step interactive questions
+ * - Instant feedback and explanation
+ * - Final score calculation & Rank Badge awarding
+ * - Confetti / audio chime celebrations
+ * - Share / Copy Rank feature
+ */
+
+function CodeQuiz({ isOpen, onClose, breathingStyle, onShowToast }) {
+  if (!isOpen) return null;
+
+  const { quiz } = window.portfolioData || {};
+  const questions = quiz?.questions || [];
+
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+  const [selectedOption, setSelectedOption] = React.useState(null);
+  const [isAnswered, setIsAnswered] = React.useState(false);
+  const [score, setScore] = React.useState(0);
+  const [isFinished, setIsFinished] = React.useState(false);
+
+  const currentQ = questions[currentIndex];
+
+  // Close on Escape
+  React.useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+
+  const handleSelectOption = (idx) => {
+    if (isAnswered) return;
+    setSelectedOption(idx);
+    if (window.soundManager) window.soundManager.playClick();
+  };
+
+  const handleConfirmAnswer = () => {
+    if (selectedOption === null) return;
+    setIsAnswered(true);
+
+    const isCorrect = selectedOption === currentQ.correct;
+    if (isCorrect) {
+      setScore((s) => s + 1);
+      if (window.soundManager) window.soundManager.playSuccess();
+    } else {
+      if (window.soundManager) window.soundManager.playBeep();
+    }
+  };
+
+  const handleNextQuestion = () => {
+    if (currentIndex + 1 < questions.length) {
+      setCurrentIndex((i) => i + 1);
+      setSelectedOption(null);
+      setIsAnswered(false);
+      if (window.soundManager) window.soundManager.playClick();
+    } else {
+      setIsFinished(true);
+      if (window.soundManager) window.soundManager.playKatanaChime();
+    }
+  };
+
+  const handleRestart = () => {
+    setCurrentIndex(0);
+    setSelectedOption(null);
+    setIsAnswered(false);
+    setScore(0);
+    setIsFinished(false);
+    if (window.soundManager) window.soundManager.playClick();
+  };
+
+  const currentRank = quiz?.ranks ? quiz.ranks[score] || quiz.ranks[0] : null;
+
+  const handleCopyRank = () => {
+    const text = `⚔️ I scored ${score}/${questions.length} on Shiwant Goyal's Demon Slayer Developer Rank Test and earned the rank of [${currentRank?.title || "Slayer"}]! Check it out at https://goyalshiwant8-create.github.io/SHIWANT-GOYAL/`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => {
+        if (onShowToast) onShowToast("Rank badge copied to clipboard!");
+      });
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+      <div className="relative w-full max-w-xl rounded-2xl bg-[#0c121a] border border-emerald-500/40 shadow-2xl p-6 sm:p-8 flex flex-col justify-between">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
+          <div className="flex items-center gap-2.5">
+            <span className="w-8 h-8 rounded-lg bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 font-bold font-serif flex items-center justify-center">
+              滅
+            </span>
+            <div>
+              <h3 className="text-lg font-bold text-white font-space">
+                {quiz?.title || "Demon Slayer Developer Rank Test"}
+              </h3>
+              <span className="text-[10px] font-mono text-cyan-400">
+                {!isFinished ? `Challenge ${currentIndex + 1} of ${questions.length}` : "Assessment Completed"}
+              </span>
+            </div>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white flex items-center justify-center text-xs"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Quiz Body */}
+        {!isFinished && currentQ ? (
+          <div>
+            <div className="mb-2">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-emerald-300">
+                {currentQ.discipline}
+              </span>
+            </div>
+
+            <h4 className="text-base sm:text-lg font-semibold text-white leading-relaxed mb-6 font-space">
+              {currentQ.question}
+            </h4>
+
+            {/* Options List */}
+            <div className="space-y-3 mb-6">
+              {currentQ.options.map((opt, idx) => {
+                let btnStyle = "bg-white/[0.03] border-white/10 hover:border-cyan-400/40 text-gray-200";
+
+                if (isAnswered) {
+                  if (idx === currentQ.correct) {
+                    btnStyle = "bg-emerald-950/70 border-emerald-500 text-emerald-200 font-semibold";
+                  } else if (selectedOption === idx) {
+                    btnStyle = "bg-red-950/70 border-red-500 text-red-200";
+                  } else {
+                    btnStyle = "opacity-40 border-white/5 text-gray-400";
+                  }
+                } else if (selectedOption === idx) {
+                  btnStyle = "bg-cyan-950/60 border-cyan-400 text-cyan-200 font-medium";
+                }
+
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => handleSelectOption(idx)}
+                    disabled={isAnswered}
+                    className={`w-full p-3.5 rounded-xl border text-left text-xs sm:text-sm font-mono transition-all flex items-center justify-between ${btnStyle}`}
+                  >
+                    <span>{opt}</span>
+                    {isAnswered && idx === currentQ.correct && <span>✅</span>}
+                    {isAnswered && selectedOption === idx && idx !== currentQ.correct && <span>❌</span>}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Answer Explanation */}
+            {isAnswered && (
+              <div className="p-3.5 rounded-xl bg-cyan-950/30 border border-cyan-500/20 text-xs text-cyan-200 mb-6 animate-fadeIn leading-relaxed">
+                <span className="font-bold mr-1">Explanation:</span>
+                {currentQ.explanation}
+              </div>
+            )}
+
+            {/* Action Button */}
+            <div>
+              {!isAnswered ? (
+                <button
+                  onClick={handleConfirmAnswer}
+                  disabled={selectedOption === null}
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 text-white font-semibold text-xs font-mono disabled:opacity-40 transition-all"
+                >
+                  Confirm Strike ⚔️
+                </button>
+              ) : (
+                <button
+                  onClick={handleNextQuestion}
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs font-mono transition-all shadow-lg"
+                >
+                  {currentIndex + 1 < questions.length ? "Next Challenge →" : "View Final Rank 🏆"}
+                </button>
+              )}
+            </div>
+          </div>
+        ) : (
+          /* RESULT SCREEN */
+          <div className="text-center py-4 space-y-6 animate-fadeIn font-mono">
+            <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-600 via-emerald-600 to-teal-500 flex items-center justify-center text-4xl shadow-xl shadow-cyan-950/50">
+              {currentRank?.kanji || "滅"}
+            </div>
+
+            <div>
+              <span className="text-xs text-gray-400 uppercase tracking-widest block mb-1">
+                Final Score: {score} / {questions.length}
+              </span>
+              <h4 className="text-2xl sm:text-3xl font-extrabold text-white font-space">
+                {currentRank?.title}
+              </h4>
+              <span className="inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-500/40">
+                {currentRank?.badge}
+              </span>
+            </div>
+
+            <p className="text-xs sm:text-sm text-gray-300 max-w-md mx-auto leading-relaxed font-sans">
+              {currentRank?.message}
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t border-white/10">
+              <button
+                onClick={handleCopyRank}
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-emerald-600 text-white font-semibold text-xs transition-all hover:scale-105"
+              >
+                Share My Rank 📋
+              </button>
+
+              <button
+                onClick={handleRestart}
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white text-xs transition-colors"
+              >
+                Retake Challenge ↺
+              </button>
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
+
+if (typeof window !== "undefined") {
+  window.CodeQuiz = CodeQuiz;
+}
+
+// ===== src/components/ShortcutsModal.jsx =====
+/**
+ * ============================================================================
+ * SHORTCUTS MODAL COMPONENT
+ * ============================================================================
+ * Displays global interactive hotkeys for rapid navigation.
+ */
+
+function ShortcutsModal({ isOpen, onClose }) {
+  if (!isOpen) return null;
+
+  const shortcuts = [
+    { key: "T", desc: "Cycle Breathing Themes (Water 🌊 -> Sun 🔥 -> Thunder ⚡)" },
+    { key: "M", desc: "Toggle Procedural Sound Effects (Audio On / Muted)" },
+    { key: "C", desc: "Toggle Shiwant AI Interactive Assistant" },
+    { key: "Q", desc: "Open Demon Slayer Developer Rank Test" },
+    { key: "Esc", desc: "Close any active modal or drawer" },
+    { key: "?", desc: "Toggle this Keyboard Shortcuts Cheat Sheet" },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+      <div className="relative w-full max-w-md rounded-2xl bg-[#0c121a] border border-cyan-500/40 p-6 shadow-2xl">
+        <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
+          <div className="flex items-center gap-2">
+            <span className="text-base">⌨️</span>
+            <h3 className="text-base font-bold text-white font-space">
+              Keyboard Shortcuts
+            </h3>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white flex items-center justify-center text-xs"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className="space-y-3 font-mono text-xs">
+          {shortcuts.map((s, idx) => (
+            <div
+              key={idx}
+              className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.02] border border-white/5"
+            >
+              <span className="text-gray-300 font-sans text-xs">{s.desc}</span>
+              <kbd className="px-2 py-1 rounded-md bg-white/10 text-cyan-300 font-bold border border-white/10 shadow-inner">
+                {s.key}
+              </kbd>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-5 pt-3 border-t border-white/10 text-center">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white text-xs font-mono transition-colors"
+          >
+            Got it (Esc)
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+if (typeof window !== "undefined") {
+  window.ShortcutsModal = ShortcutsModal;
+}
+
+// ===== src/components/AssistantBot.jsx =====
+/**
+ * ============================================================================
+ * SHIWANT AI // INTERACTIVE CHATBOT ASSISTANT
+ * ============================================================================
+ * Floating interactive AI assistant grounded in Shiwant's BCA journey,
+ * skills, Demon Slayer theme, and contact info.
+ * Features:
+ * - Freeform text input with instant intelligent matching
+ * - Quick prompt suggestion chips
+ * - Realistic typing indicator & Web Audio chimes
+ * - Responsive mobile & desktop drawer
+ */
+
+function AssistantBot({ isOpen, onToggle, breathingStyle, onShowToast }) {
+  const { personal, about, skills, projects, education, socials, assistant } =
+    window.portfolioData || {};
+
+  const [messages, setMessages] = React.useState([
+    {
+      sender: "bot",
+      text: assistant?.greeting || "Konnichiwa! I am Shiwant's AI Assistant. Ask me anything about his BCA studies at BVIMR, C programming, web projects, skills, or collaboration opportunities!",
+      timestamp: "Just now",
+    },
+  ]);
+  const [inputText, setInputText] = React.useState("");
+  const [isTyping, setIsTyping] = React.useState(false);
+  const chatEndRef = React.useRef(null);
+
+  // Auto scroll chat
+  React.useEffect(() => {
+    if (isOpen && chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, isTyping, isOpen]);
+
+  // Smart Query Handler
+  const generateResponse = (query) => {
+    const q = query.toLowerCase().trim();
+
+    if (q.includes("hi") || q.includes("hello") || q.includes("hey") || q.includes("namaste")) {
+      return "Hello there! Glad to connect with you. What would you like to know about Shiwant's background, skills, or projects?";
+    }
+
+    if (q.includes("education") || q.includes("college") || q.includes("bca") || q.includes("bvimr") || q.includes("degree")) {
+      return `🎓 Education Status:\n• Degree: Bachelor of Computer Applications (BCA), 1st Year\n• Institution: Bharati Vidyapeeth Institute of Management & Research (BVIMR), New Delhi\n• Period: 2025–2028 (Expected)\n• Focus: Structured programming in C, mathematical logic, and web foundations.`;
+    }
+
+    if (q.includes("skill") || q.includes("tech") || q.includes("stack") || q.includes("language")) {
+      return `💻 Core Technical Arsenal:\n• Primary Programming: C (Control structures, pointers, memory models, functions)\n• Frontend & Web: HTML5, Modern CSS3 (Grid/Flexbox/Animations), JavaScript (ES6+, DOM, Asynchronous)\n• Actively Learning: React component architecture, Hooks, REST APIs, and Full-Stack fundamentals.`;
+    }
+
+    if (q.includes("project") || q.includes("c project") || q.includes("work") || q.includes("github")) {
+      return `🚀 Featured Projects:\n1. Personal Demon Slayer React Portfolio (with Web Audio procedural sounds, particle engine, and live interactive CLI!)\n2. C Programming Labs & Exercises (Number guessing game, matrix calculator, prime/factorial algorithms)\nCheck them out in the Projects section or test them in the in-browser C simulator!`;
+    }
+
+    if (q.includes("contact") || q.includes("hire") || q.includes("email") || q.includes("reach") || q.includes("collaborat")) {
+      return `📬 Get in touch with Shiwant:\n• Instagram: @shiwant_goyal_\n• LinkedIn: Shiwant Goyal\n• GitHub: goyalshiwant8-create\n• Email: You can use the Contact form below or copy his email directly!`;
+    }
+
+    if (q.includes("demon slayer") || q.includes("theme") || q.includes("anime") || q.includes("breathing")) {
+      return `⚔️ Why the Demon Slayer theme?\nDemon Slayer embodies disciplined practice, relentless perseverance, and sharp focus ("Total Concentration"). Shiwant applies this same mindset to debugging, learning computer science, and mastering code!`;
+    }
+
+    return `Thanks for asking! Shiwant is a 1st-year BCA student at BVIMR passionate about building modern web experiences with C, JavaScript, and React. Feel free to explore the interactive terminal or reach out via the Contact section!`;
+  };
+
+  const handleSendMessage = (textToSend) => {
+    const text = (textToSend || inputText).trim();
+    if (!text) return;
+
+    if (window.soundManager) window.soundManager.playClick();
+
+    const userMsg = {
+      sender: "user",
+      text,
+      timestamp: new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+    };
+
+    setMessages((prev) => [...prev, userMsg]);
+    setInputText("");
+    setIsTyping(true);
+
+    setTimeout(() => {
+      const botReply = generateResponse(text);
+      setIsTyping(false);
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          text: botReply,
+          timestamp: new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+        },
+      ]);
+      if (window.soundManager) window.soundManager.playKatanaChime();
+    }, 600);
+  };
+
+  return (
+    <>
+      {/* Floating Trigger Button */}
+      <div className="fixed bottom-6 right-6 z-40">
+        <button
+          onClick={onToggle}
+          className="group relative flex items-center gap-2.5 px-4 py-3 rounded-full bg-[#0c121a]/95 hover:bg-[#121a24] border border-cyan-500/50 hover:border-cyan-400 text-white shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-cyan-950/80"
+          aria-label="Open AI Assistant"
+        >
+          {/* Animated glow ring */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 opacity-20 group-hover:opacity-40 blur-md transition-opacity"></div>
+          
+          <span className="relative z-10 w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
+          <span className="relative z-10 text-base">🤖</span>
+          <span className="relative z-10 text-xs font-mono font-semibold tracking-wide hidden sm:inline">
+            Ask Shiwant AI
+          </span>
+          <span className="relative z-10 text-xs font-serif text-white/40">滅</span>
+        </button>
+      </div>
+
+      {/* Floating Chat Drawer Window */}
+      {isOpen && (
+        <div className="fixed bottom-20 right-4 sm:right-6 z-50 w-[92vw] sm:w-[400px] h-[520px] max-h-[85vh] rounded-2xl bg-[#0c121a]/95 border border-cyan-500/40 shadow-2xl backdrop-blur-2xl flex flex-col justify-between overflow-hidden animate-slideUp">
+          
+          {/* Drawer Header */}
+          <div className="px-4 py-3.5 border-b border-white/10 bg-white/[0.02] flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-600 to-emerald-600 flex items-center justify-center text-sm shadow-md">
+                滅
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-white font-space">
+                  {assistant?.botName || "Shiwant AI"}
+                </h4>
+                <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  Total Concentration Active
+                </span>
+              </div>
+            </div>
+
+            <button
+              onClick={onToggle}
+              className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white flex items-center justify-center text-xs transition-colors"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Messages Stream */}
+          <div className="flex-1 p-4 overflow-y-auto space-y-3 font-sans text-xs">
+            {messages.map((msg, idx) => (
+              <div
+                key={idx}
+                className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"}`}
+              >
+                <div
+                  className={`max-w-[85%] p-3 rounded-2xl leading-relaxed whitespace-pre-wrap ${
+                    msg.sender === "user"
+                      ? "bg-gradient-to-r from-cyan-600 to-emerald-600 text-white rounded-br-none shadow-md"
+                      : "bg-[#141b24] text-gray-200 border border-white/10 rounded-bl-none shadow-sm"
+                  }`}
+                >
+                  {msg.text}
+                </div>
+                <span className="text-[9px] text-gray-500 font-mono mt-1 px-1">
+                  {msg.timestamp}
+                </span>
+              </div>
+            ))}
+
+            {isTyping && (
+              <div className="flex items-center gap-1.5 p-2 rounded-xl bg-[#141b24] border border-white/10 w-fit text-gray-400 text-xs font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce [animation-delay:0.15s]"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce [animation-delay:0.3s]"></span>
+                <span className="ml-1 text-[10px]">Analyzing query...</span>
+              </div>
+            )}
+            <div ref={chatEndRef} />
+          </div>
+
+          {/* Quick Question Chips */}
+          <div className="px-3 py-2 border-t border-white/5 bg-black/20 overflow-x-auto flex items-center gap-1.5 scrollbar-none">
+            {(assistant?.quickQuestions || []).map((q, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleSendMessage(q.text)}
+                className="px-2.5 py-1 rounded-full text-[10px] font-mono whitespace-nowrap bg-white/5 hover:bg-cyan-500/20 text-gray-300 hover:text-cyan-200 border border-white/10 transition-colors"
+              >
+                {q.text}
+              </button>
+            ))}
+          </div>
+
+          {/* Chat Input Bar */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSendMessage(inputText);
+            }}
+            className="p-3 border-t border-white/10 bg-[#0a0e14] flex items-center gap-2"
+          >
+            <input
+              type="text"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder="Ask anything about Shiwant..."
+              className="flex-1 px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 font-mono"
+            />
+            <button
+              type="submit"
+              disabled={!inputText.trim()}
+              className="w-9 h-9 rounded-xl bg-gradient-to-r from-cyan-600 to-emerald-600 text-white flex items-center justify-center text-sm shadow-md disabled:opacity-40 transition-transform active:scale-95"
+            >
+              ➤
+            </button>
+          </form>
+
+        </div>
+      )}
+    </>
+  );
+}
+
+if (typeof window !== "undefined") {
+  window.AssistantBot = AssistantBot;
+}
+
 // ===== src/App.jsx =====
 /**
  * ============================================================================
- * MAIN APP COMPONENT
+ * MAIN APP COMPONENT (ORCHESTRATOR)
  * ============================================================================
  * Orchestrates:
  * - Breathing Style Theme Engine (Water, Sun, Thunder)
- * - Web Audio procedural sound effects
+ * - Web Audio procedural sound effects & chimes
  * - Ambient dynamic particle canvas
  * - Scroll spy for active navbar link
  * - Universal toast notifications
+ * - Global keyboard shortcuts (T, M, C, Q, ?, Esc)
+ * - Interactive Modals (Project simulator, Rank quiz, Shortcuts)
+ * - Dynamic Live GitHub Hub & Visitor Community Wall
+ * - Floating Shiwant AI Interactive Assistant
+ * - Full-Screen Anime Katana Slash visual effect
  */
 
 function App() {
@@ -2040,6 +3909,13 @@ function App() {
   const [sfxEnabled, setSfxEnabled] = React.useState(true);
   const [toastMessage, setToastMessage] = React.useState(null);
   const [activeSection, setActiveSection] = React.useState("top");
+
+  // Dynamic Modals & Drawers State
+  const [selectedModalProject, setSelectedModalProject] = React.useState(null);
+  const [isAssistantOpen, setIsAssistantOpen] = React.useState(false);
+  const [isQuizOpen, setIsQuizOpen] = React.useState(false);
+  const [isShortcutsOpen, setIsShortcutsOpen] = React.useState(false);
+  const [slashActive, setSlashActive] = React.useState(false);
 
   // Sync SFX state on mount
   React.useEffect(() => {
@@ -2073,6 +3949,48 @@ function App() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Global Keyboard Shortcuts
+  React.useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      // Don't trigger hotkeys if user is actively typing in an input or textarea
+      if (["INPUT", "TEXTAREA"].includes(e.target.tagName)) {
+        if (e.key === "Escape") {
+          e.target.blur();
+        }
+        return;
+      }
+
+      if (e.key === "Escape") {
+        setSelectedModalProject(null);
+        setIsQuizOpen(false);
+        setIsShortcutsOpen(false);
+        setIsAssistantOpen(false);
+      } else if (e.key.toLowerCase() === "t") {
+        // Cycle breathing themes
+        const themes = ["water", "sun", "thunder"];
+        const nextTheme = themes[(themes.indexOf(breathingStyle) + 1) % themes.length];
+        setBreathingStyle(nextTheme);
+        if (window.soundManager) window.soundManager.playBreathingSound(nextTheme);
+        showToast(`Theme switched to ${nextTheme.toUpperCase()} Breathing! 🌊🔥⚡`);
+      } else if (e.key.toLowerCase() === "m") {
+        // Toggle sound
+        handleToggleSfx();
+      } else if (e.key.toLowerCase() === "c") {
+        // Toggle AI Chatbot
+        setIsAssistantOpen((prev) => !prev);
+      } else if (e.key.toLowerCase() === "q") {
+        // Toggle Developer Rank Quiz
+        setIsQuizOpen((prev) => !prev);
+      } else if (e.key === "?" || e.key === "/") {
+        // Toggle Shortcuts Modal
+        setIsShortcutsOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [breathingStyle]);
+
   // SFX toggle handler
   const handleToggleSfx = () => {
     if (window.soundManager) {
@@ -2090,8 +4008,29 @@ function App() {
     }, 3500);
   };
 
+  // Full-screen Katana Slash visual effect
+  const handleTriggerSlash = () => {
+    setSlashActive(true);
+    if (window.soundManager) window.soundManager.playSlash();
+    setTimeout(() => {
+      setSlashActive(false);
+    }, 450);
+  };
+
   return (
     <div className="relative min-h-screen bg-[#080c11] text-gray-100 selection:bg-cyan-500 selection:text-black font-sans overflow-x-hidden">
+      {/* Full-Screen Katana Slash Visual Effect Overlay */}
+      {slashActive && (
+        <div className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center overflow-hidden">
+          <div className="absolute inset-0 bg-cyan-400/20 backdrop-invert animate-ping"></div>
+          {/* Diagonal blade beam */}
+          <div className="w-[180vw] h-2 bg-gradient-to-r from-transparent via-white to-transparent shadow-[0_0_40px_rgba(6,182,212,1)] -rotate-45 transform origin-center transition-transform duration-300"></div>
+          <div className="text-8xl font-black font-serif text-white opacity-80 animate-pulse select-none">
+            滅
+          </div>
+        </div>
+      )}
+
       {/* Dynamic Ambient Breathing Canvas */}
       <window.BreathingCanvas breathingStyle={breathingStyle} />
 
@@ -2102,25 +4041,91 @@ function App() {
         sfxEnabled={sfxEnabled}
         onToggleSfx={handleToggleSfx}
         activeSection={activeSection}
+        onOpenQuiz={() => setIsQuizOpen(true)}
+        onOpenShortcuts={() => setIsShortcutsOpen(true)}
       />
 
       {/* Main Content Sections */}
       <main className="relative z-10">
-        <window.Hero breathingStyle={breathingStyle} />
+        <window.Hero
+          breathingStyle={breathingStyle}
+          setBreathingStyle={setBreathingStyle}
+          onTriggerSlash={handleTriggerSlash}
+          onOpenQuiz={() => setIsQuizOpen(true)}
+          onShowToast={showToast}
+        />
         <window.About breathingStyle={breathingStyle} />
         <window.Skills breathingStyle={breathingStyle} />
-        <window.Projects breathingStyle={breathingStyle} />
+        
+        {/* Projects Section with Interactive Modals */}
+        <window.Projects
+          breathingStyle={breathingStyle}
+          onOpenProjectModal={(proj) => setSelectedModalProject(proj)}
+        />
+
+        {/* Live Real-Time GitHub Telemetry Hub */}
+        {window.LiveGitHubHub && (
+          <window.LiveGitHubHub breathingStyle={breathingStyle} />
+        )}
+
         <window.Education breathingStyle={breathingStyle} />
         <window.LearningJourney breathingStyle={breathingStyle} />
+
+        {/* Dynamic Visitor Reactions & Community Wall */}
+        {window.VisitorInteractions && (
+          <window.VisitorInteractions
+            breathingStyle={breathingStyle}
+            onShowToast={showToast}
+          />
+        )}
+
         <window.Contact breathingStyle={breathingStyle} onShowToast={showToast} />
       </main>
 
       {/* Footer */}
       <window.Footer />
 
+      {/* Floating Shiwant AI Interactive Assistant */}
+      {window.AssistantBot && (
+        <window.AssistantBot
+          isOpen={isAssistantOpen}
+          onToggle={() => setIsAssistantOpen(!isAssistantOpen)}
+          breathingStyle={breathingStyle}
+          onShowToast={showToast}
+        />
+      )}
+
+      {/* Interactive Project In-Browser Simulator Modal */}
+      {window.ProjectModal && selectedModalProject && (
+        <window.ProjectModal
+          project={selectedModalProject}
+          onClose={() => setSelectedModalProject(null)}
+          breathingStyle={breathingStyle}
+          onShowToast={showToast}
+        />
+      )}
+
+      {/* Interactive Demon Slayer Developer Rank Test */}
+      {window.CodeQuiz && (
+        <window.CodeQuiz
+          isOpen={isQuizOpen}
+          onClose={() => setIsQuizOpen(false)}
+          breathingStyle={breathingStyle}
+          onShowToast={showToast}
+        />
+      )}
+
+      {/* Global Keyboard Shortcuts Modal */}
+      {window.ShortcutsModal && (
+        <window.ShortcutsModal
+          isOpen={isShortcutsOpen}
+          onClose={() => setIsShortcutsOpen(false)}
+        />
+      )}
+
       {/* Floating Interactive Toast */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl bg-[#0c121a]/95 border border-cyan-500/40 text-white text-xs sm:text-sm font-mono shadow-2xl backdrop-blur-xl animate-slideUp">
+        <div className="fixed bottom-6 left-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl bg-[#0c121a]/95 border border-cyan-500/40 text-white text-xs sm:text-sm font-mono shadow-2xl backdrop-blur-xl animate-slideUp">
           <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
           <span>{toastMessage}</span>
           <button

@@ -416,6 +416,38 @@ Virtual DOM: Synchronized with Nichirin Canvas
 State: Ready for Web Development!`,
     },
     {
+      id: "algorithms.c",
+      language: "c",
+      label: "algorithms.c",
+      badge: "Algorithms",
+      code: `#include <stdio.h>
+
+// Nichirin Binary Search & Logic Algorithm
+int binarySearch(int arr[], int size, int target) {
+    int low = 0, high = size - 1;
+    while (low <= high) {
+        int mid = low + (high - low) / 2;
+        if (arr[mid] == target) return mid;
+        if (arr[mid] < target) low = mid + 1;
+        else high = mid - 1;
+    }
+    return -1; // Target not found
+}
+
+int main() {
+    int skills[] = {1, 3, 7, 11, 23, 42, 99};
+    int found = binarySearch(skills, 7, 42);
+    printf("Target 42 found at index: %d\\n", found);
+    printf("Total Concentration: O(log N) Efficiency!\\n");
+    return 0;
+}`,
+      output: `[GCC COMPILE SUCCESSFUL]
+> ./algorithms.exe
+Target 42 found at index: 5
+Total Concentration: O(log N) Efficiency!
+All test cases passed cleanly.`,
+    },
+    {
       id: "journey.md",
       language: "markdown",
       label: "journey.md",
@@ -437,6 +469,102 @@ Foundational Mastery: Active and progressing.
 Every line of code counts!`,
     },
   ],
+
+  // Interactive Quiz: Demon Slayer Developer Rank Test
+  quiz: {
+    title: "Demon Slayer Developer Rank Test",
+    subtitle: "3 Quick Challenges to Test Your Logic & Web Mastery",
+    questions: [
+      {
+        id: 1,
+        discipline: "C Programming & Logic",
+        question: "In C language, what is the output of: printf(\"%d\", 7 / 2); ?",
+        options: ["3.5", "3", "4", "Runtime Error"],
+        correct: 1,
+        explanation: "In C, integer divided by integer performs integer division (truncating decimals), yielding 3!",
+      },
+      {
+        id: 2,
+        discipline: "Modern Web Standards",
+        question: "Which HTML5 semantic element is best practice for primary site navigation?",
+        options: ["<div class=\"nav\">", "<navigation>", "<nav>", "<menu-bar>"],
+        correct: 2,
+        explanation: "<nav> is the standardized HTML5 landmark tag for accessibility and SEO.",
+      },
+      {
+        id: 3,
+        discipline: "Total Concentration Engineering",
+        question: "In Demon Slayer, constant practice preserves form. In software development, which practice achieves this?",
+        options: [
+          "Refactoring & continuous testing",
+          "Never touching working code",
+          "Copy-pasting from StackOverflow without reading",
+          "Writing 1000-line single functions"
+        ],
+        correct: 0,
+        explanation: "Continuous refactoring, automated testing, and modular architecture keep codebases maintainable!",
+      },
+    ],
+    ranks: {
+      0: { title: "Mizunoto Initiate", kanji: "癸", badge: "Beginner Slayer", message: "Keep training your breathing basics! Every master began as a novice." },
+      1: { title: "Kinoe Apprentice", kanji: "甲", badge: "Rising Talent", message: "Strong grasp! Your foundational blade is sharpening fast." },
+      2: { title: "Tsuguko Candidate", kanji: "継子", badge: "Advanced Practitioner", message: "Impressive focus! You demonstrate deep technical discipline." },
+      3: { title: "Hashira Rank Developer", kanji: "柱", badge: "Total Concentration Master", message: "Flawless score! You possess the wisdom of a true Web & C Hashira!" },
+    },
+  },
+
+  // Dynamic Visitor Reactions (Initial counts, synced to localStorage)
+  reactions: {
+    slay: { id: "slay", emoji: "⚔️", label: "Total Concentration", defaultCount: 142 },
+    speed: { id: "speed", emoji: "⚡", label: "Fast Learner", defaultCount: 98 },
+    potential: { id: "potential", emoji: "🚀", label: "High Potential", defaultCount: 116 },
+    clean: { id: "clean", emoji: "💡", label: "Clean Code", defaultCount: 89 },
+  },
+
+  // Dynamic Guestbook / Endorsements Wall (Stored in localStorage with seed items)
+  guestbook: [
+    {
+      id: "seed-1",
+      name: "Aryan Sharma",
+      role: "BCA Classmate @ BVIMR",
+      badge: "Fellow Slayer",
+      message: "Shiwant's dedication to C programming and web UI is genuinely inspiring! His Demon Slayer theme is super sick.",
+      date: "Recent",
+      avatarEmoji: "🌊",
+    },
+    {
+      id: "seed-2",
+      name: "Rohit Verma",
+      role: "Web Developer",
+      badge: "Tech Peer",
+      message: "Really clean code structure and attention to detail. Great job on the procedural audio and interactive terminal!",
+      date: "Recent",
+      avatarEmoji: "🔥",
+    },
+    {
+      id: "seed-3",
+      name: "Aditi Gupta",
+      role: "BCA Tech Club Member",
+      badge: "Campus Student",
+      message: "Great portfolio, Shiwant! Loved how you documented both your current C projects and upcoming React roadmap.",
+      date: "Recent",
+      avatarEmoji: "⚡",
+    },
+  ],
+
+  // AI Assistant Knowledge Base
+  assistant: {
+    botName: "Shiwant AI",
+    botTitle: "Nichirin Portfolio Assistant",
+    greeting: "Konnichiwa! I am Shiwant's AI Assistant. Ask me anything about his BCA studies at BVIMR, C programming, web projects, skills, or collaboration opportunities!",
+    quickQuestions: [
+      { text: "What is Shiwant's education?", query: "education" },
+      { text: "What are his main skills?", query: "skills" },
+      { text: "Show me his C projects", query: "c projects" },
+      { text: "How can I contact him?", query: "contact" },
+      { text: "Why Demon Slayer theme?", query: "theme" },
+    ],
+  },
 };
 
 // Export for module/window environments

@@ -182,6 +182,72 @@ class SoundSynthesizer {
     } catch (e) {}
   }
 
+  // High-pitched celebratory chord for quiz success / message send
+  playSuccess() {
+    if (!this.enabled) return;
+    try {
+      this.init();
+      if (!this.audioCtx) return;
+      const ctx = this.audioCtx;
+      const now = ctx.currentTime;
+      [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, now + i * 0.06);
+        gain.gain.setValueAtTime(0.04, now + i * 0.06);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.25);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + i * 0.06);
+        osc.stop(now + i * 0.06 + 0.25);
+      });
+    } catch (e) {}
+  }
+
+  // Terminal keystroke beep / notification
+  playBeep() {
+    if (!this.enabled) return;
+    try {
+      this.init();
+      if (!this.audioCtx) return;
+      const ctx = this.audioCtx;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(800, now);
+      gain.gain.setValueAtTime(0.015, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.03);
+    } catch (e) {}
+  }
+
+  // Deep resonant Katana Slash sound effect
+  playSlash() {
+    if (!this.enabled) return;
+    try {
+      this.init();
+      if (!this.audioCtx) return;
+      const ctx = this.audioCtx;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(1400, now);
+      osc.frequency.exponentialRampToValueAtTime(120, now + 0.22);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.25);
+    } catch (e) {}
+  }
+
   // Play sound specific to breathing style
   playBreathingSound(style) {
     if (style === "water") this.playWaterDrop();
